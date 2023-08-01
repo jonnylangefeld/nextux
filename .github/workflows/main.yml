@@ -1,0 +1,22 @@
+name: Main
+
+on:
+  push:
+
+jobs:
+  lint-test:
+    name: Lint & Test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.1
+      - name: Install Dependencies
+        run: npm install
+      - name: Run Lint
+        run: npm run lint
+      - name: Run Tests
+        run: npm test
