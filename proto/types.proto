@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+// ExtractRequest is the body sent to the /extract endpoint
+message ExtractRequest {
+  // document contains a base64 encoded string of a document like PDF or png
+  //
+  // @minLength 1
+  string document = 1;
+  // jsonSchema is a json schema object as a base64 encoded string as defined by https://json-schema.org/understanding-json-schema/
+  //
+  // @minLength 1
+  string jsonSchema = 2;
+}

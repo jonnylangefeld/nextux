@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "nextux-dev",
+  "private_key_id": "263bcb9f72da323d1fba24b065b5d6a4f619cb13",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC5j0R8jZ68sFgn\nuiF22ZxcvR7g/Cn+47QIk0Zua3Y8d8mQzE6lMgwr12Avmr88gEwk+NJlUTaMmwDA\n12zwXJnS3cvHr3iIyNcNez8seuMVOYj9zj2WIM0UV3dmLdqjgBB9QwX+x8z7Ziju\nKj0CFn6PgQGwRRm35yv2oBgslaD5C7B8c9jD+E7nghpGRzbT/3KZVAPmBf7AND5i\nOvaDPxMjYpK4rMKK85YL/gCVWKlizz+AUjPrFuMf0ScgrUQyoMjojm7aBIKrYB/1\naeqFRjNjSLQiUcZ53K6+V0eXqY29lB3sD22hbXoefZVMBpj7pDmmO/y3uDFVm6TV\nXUL3bTNrAgMBAAECggEAT4QpYQZ/I3SeEkgc1wVhkAwrE1Z72JJTL+mMoPzD6h2a\n7sXeXcQYmyDsQvoZQR/pgV5vKqOmsJIrvHeUY1wLPuV00dlL2bHXFhvecn0mmo3R\nOpIKqi7cMv9YVx0HOFFEv6jdBNUx7flVSNoo0qA5E93Aj3zNDJWvrTvloBVuqcmx\nsWRIGplSn992GyLI+6QZGxvPCDrKr9M4h5o1jBqa2QxvsDM6YrumO+eQtpbg/US+\n1EXEltt3a510W4zNNPAeG/f2X737OuzE1oQ3k8c30RRfr3cSrPBxTLQpVrlEzExX\nXTcIFh8IJNUVPQbu++fR3VwgLyHWa2rRnVvT+/jGwQKBgQDgpOV+33dwE86mJ0Xs\nH0pFry1lNDwZTIxT8V8tTmCRhbHi207HSJc6mOffjjKZ2bYguJ6zjB60fyT4GKgf\n7VCV6UR30qleD3PwsDjEuoiOpnn6U69pYqrP+QPQZ7OvGOdA8wjYvJCew0FsWYb4\ndJ2QHussLFv//aiJrwmP+v6oOQKBgQDTdciH6vsLJ2YZfUBVZ1NN9NzDxqovJ3gl\ns9B45WFqIziAWU+82tOUTEZA1vMXMPQcQUKba4xhLCHGKEdG5NKYnbvsh8WocpMc\nK7IFmJR7RwiMMdKCrs/gVAZwamKj7NLAFKRgoiUtSa+ByTjRUwFumFydP8GBscfj\nnczHAWuQwwKBgGvrS8UTndFd8pynqVOyBIBNk8VWvrh4qcF553tgd8vxKnANY18h\nZGVmJ56iNXTrvi8iAjvHSMj1e9EkJ0CPRXN/SME3lt31FoG+Zsc7xXaiS18S7OX3\n3I9k1Yw9BXlMwWvWVZ2pmOBsdPWUXN7nRvqBoADsnpXwShM636Ent0chAoGAdHXE\nEYdK5+O1CYi/68lSSfb3tyMtC3dTZoBX6p16PzhSn+2QStTB/kTb1E4N59HgP8d5\nZZuf3sytdTMtvk+75K3KmARWyeUAPF2cWBSmghanEH9IDw00E7pzKWqOFPYTRBKa\nTVY/32dbr8Eg97gda8miCEDa1BETo7p+04NmuH0CgYEApYD4tTOeylEXQNZzPKxS\n0teFDCM1OX3XgOpz7fVhjnIN0tYgh+KNScRKK30e+UOgmIi+2j3duPip+2kDxD5h\nGC3+S9hj+ExIYCf9HEMXrxMRntNSNaVjxs+gZ1sNM5vNbeUK4oNqlnJpUCZfmFMP\nf1DSB7YuK3/Ktgqnt4OBQMM=\n-----END PRIVATE KEY-----\n",
+  "client_email": "nextux-dev-service-account@nextux-dev.iam.gserviceaccount.com",
+  "client_id": "103331093597313585711",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nextux-dev-service-account%40nextux-dev.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
