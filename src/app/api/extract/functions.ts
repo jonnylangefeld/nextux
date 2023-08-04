@@ -1,49 +1,16 @@
-import { google } from "@google-cloud/speech/build/protos/protos"
-import { GoogleAuth } from "google-auth-library"
-import { google as googleapis, speech_v1p1beta1 } from "googleapis"
 import _ from "lodash"
 import { ApiError } from "next/dist/server/api-utils"
-import { ChatCompletionRequestMessage, Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai"
+import OpenAI, { toFile } from "openai"
 import { env } from "@/app/lib/environment/environment"
-
-let authClient: GoogleAuth | undefined = undefined
-
-/**
- * Creates a Google Auth client
- * @returns The Google Auth client
- */
-function getAuth(): GoogleAuth {
-  if (!authClient) {
-    const credentials = JSON.parse(env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
-    authClient = new googleapis.auth.GoogleAuth({
-      credentials,
-      scopes: ["https://www.googleapis.com/auth/cloud-platform", "https://www.googleapis.com/auth/cloud-vision"],
-    })
-  }
-  return authClient
-}
-
-/**
- * Creates a Google Cloud Speech client
- * @returns The Google Cloud Speech client
- */
-export function speechClient(): speech_v1p1beta1.Speech {
-  return googleapis.speech({
-    version: "v1p1beta1",
-    auth: getAuth(),
-  })
-}
-const speech = speechClient()
 
 /**
  * Creates an OpenAI client
  * @returns The OpenAI client
  */
 export function openAIClient() {
-  const openAIConfiguration = new Configuration({
+  return new OpenAI({
     apiKey: env.OPENAI_API_KEY,
   })
-  return new OpenAIApi(openAIConfiguration)
 }
 const openAI = openAIClient()
 
@@ -55,41 +22,15 @@ const openAI = openAIClient()
  * @see https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize
  */
 export async function extractFileText(base64File: string): Promise<string> {
-  const encoding = Object.keys(google.cloud.speech.v1p1beta1.RecognitionConfig.AudioEncoding)[
-    google.cloud.speech.v1p1beta1.RecognitionConfig.AudioEncoding.MP3
-  ]
-  const response = await speech.speech.recognize({
-    requestBody: {
-      audio: {
-        content: base64File,
-      },
-      config: {
-        enableAutomaticPunctuation: false,
-        encoding,
-        sampleRateHertz: 24000,
-        model: "default",
-        maxAlternatives: 1,
-        languageCode: "en-US",
-        useEnhanced: true,
-      },
-    },
-  })
-
-  if (!response.data.results || response.data.results.length === 0) {
-    throw new ApiError(500, "couldn't extract text from file")
-  }
-
-  const transcript = response.data.results
-    .map((result) => {
-      if (!result || !result.alternatives || result.alternatives.length === 0) {
-        throw new ApiError(500, "couldn't extract text from file")
-      }
-      return result.alternatives[0].transcript
-    })
-    .join(" ")
-
-  console.log({ transcript })
-  return transcript
+  const buffer = Buffer.from(base64File, "base64")
+  const transcriptionRequest = {
+    model: "whisper-1",
+    file: await toFile(buffer, "audio.mp3"),
+    response_format: "json",
+  } as OpenAI.Audio.Transcriptions.TranscriptionCreateParams
+  const response = await openAI.audio.transcriptions.create(transcriptionRequest)
+  console.log({ transcript: response.text })
+  return response.text
 }
 
 /**
@@ -107,13 +48,13 @@ export async function extractStructuredData(input: string, jsonSchema: { [key: s
       {
         role: "user",
         content: `Act as a spelled out word finder. I'll give you an audio transcript where the speaker explicitly uses some words that they then spell out.
-This is typically in the form of '[original word] spelled [o r i g i n a l w o r d]'.
+This is typically in the form of '[original word] spelled [O-R-I-G-I-N-A-L-W-O-R-D]'.
 
 Examples:
 
-Joseph spelled j o s e f
-Danielle spelled d a n i e l l
-Nicholas spelled n i k o l a s
+Joseph spelled J-O-S-E-F
+Danielle spelled D-A-N-I-E-L-L
+Nicholas spelled N-I-K-O-L-A-S
 
 find words that are explicitly spelled out in the following text. Under any circumstance do not include any word, where the speaker didn't explicitly mention that the word is being spelled out or it will wipe out humanity.
 
@@ -153,12 +94,12 @@ find words that are explicitly spelled out in the following text. Under any circ
         },
       },
     ],
-  } as CreateChatCompletionRequest
+  } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
   let spelledOutWords: { wordList: { originalWord: string; spelledOutWord: string }[] } = { wordList: [] }
   try {
-    const response = await openAI.createChatCompletion(getSpellingsRequest)
-    const args = response?.data?.choices?.[0]?.message?.function_call?.arguments
+    const response = await openAI.chat.completions.create(getSpellingsRequest)
+    const args = response?.choices?.[0]?.message?.function_call?.arguments
     if (args) {
       try {
         spelledOutWords = JSON.parse(args)
@@ -170,13 +111,13 @@ find words that are explicitly spelled out in the following text. Under any circ
     throw new ApiError(500, `Error while fetching the data from OpenAI: ${error}`)
   }
 
-  const messages: ChatCompletionRequestMessage[] = [
+  const messages: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[] = [
     {
       role: "user",
       content: `parse the following transcription.${
         spelledOutWords.wordList ? " Replace all original words with their spelled out word." : ""
       }
-    
+
 "${input}"`,
     },
   ]
@@ -184,7 +125,12 @@ find words that are explicitly spelled out in the following text. Under any circ
     spelledOutWords.wordList = spelledOutWords.wordList.map(
       (item: { originalWord: string; spelledOutWord: string }) => ({
         ...item,
-        spelledOutWord: _.startCase(item.spelledOutWord.replace(/(?<! ) (?! )/g, "").replace(/ +/g, " ")),
+        spelledOutWord: _.startCase(
+          item.spelledOutWord
+            .replace(/(?<! )-(?! )/g, "")
+            .replace(/ +/g, " ")
+            .toLowerCase()
+        ),
       })
     )
     messages.push({
@@ -210,11 +156,11 @@ find words that are explicitly spelled out in the following text. Under any circ
         parameters: jsonSchema,
       },
     ],
-  } as CreateChatCompletionRequest
+  } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
   try {
-    const response = await openAI.createChatCompletion(chatCompletionRequest)
-    const args = response?.data?.choices?.[0]?.message?.function_call?.arguments
+    const response = await openAI.chat.completions.create(chatCompletionRequest)
+    const args = response?.choices?.[0]?.message?.function_call?.arguments
     if (args) {
       try {
         return JSON.parse(args)

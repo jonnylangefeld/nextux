@@ -16,7 +16,7 @@ const simpleJsonSchema = {
     },
   },
 }
-const simpleTranscript = "Hello world."
+const simpleTranscript = "Hello, world."
 
 const complexFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/complex.mp3"))
 const complexFileBase64 = complexFileBuffer.toString("base64")
@@ -37,20 +37,28 @@ const complexJsonSchema = {
         },
       },
     },
-    fromAirport: {
+    fromAirportCodes: {
       type: "array",
-      description: "List of airport codes for the departure airport",
+      description: "List of IATA airport codes for the departure airport",
       items: {
         type: "string",
-        description: "airport code. If a city is given, transform into the major airport code.",
+        description: "three letter airport code. If a city is given, transform into the major airport code.",
+        minLength: 3,
+        maxLength: 3,
+        pattern: "^[A-Z]{3}$",
+        examples: ["JFK", "MUC", "BER", "CDG", "SIN", "FRA", "MEX"],
       },
     },
-    toAirport: {
+    toAirportCodes: {
       type: "array",
-      description: "List of airport codes for the destination airport",
+      description: "List of IATA airport codes for the destination airport",
       items: {
         type: "string",
-        description: "airport code. If a city is given, transform into the major airport code.",
+        description: "three letter airport code. If a city is given, transform into the major airport code.",
+        minLength: 3,
+        maxLength: 3,
+        pattern: "^[A-Z]{3}$",
+        examples: ["JFK", "MUC", "BER", "CDG", "SIN", "FRA", "MEX"],
       },
     },
     fromDate: {
@@ -64,7 +72,7 @@ const complexJsonSchema = {
   },
 }
 const complexTranscript =
-  "okay so my name is Johnny. Spelled j o n n y and I want to travel with my wife Mackenzie that spelled m c k e n z i e from any airport in and around San Francisco like SFO or Oakland or San Jose and you want to fly down to LA and do you want to travel next Wednesday through Sunday"
+  "Okay, so my name is Johnny, that's spelled J-O-N-N-Y, and I want to travel with my wife, Mackenzie, that's spelled M-C-K-E-N-Z-I-E, from any airport in and around San Francisco, like SFO, or Oakland, or San Jose. And we want to fly down to LA, and we want to travel next Wednesday through Sunday."
 
 const context = setupPolly({
   adapters: [NodeHttpAdapter],
@@ -132,7 +140,7 @@ describe("extractFileText", () => {
     const got = await extractFileText(fileBase64)
 
     expect(got).toEqual(
-      "do my name is Johnny and that's spelled j o o m m y and I'm traveling with my wife that's spelled m c k e n z i e n do you want to travel from any airport in or around San Francisco like SSO or Oakland or San Jose to Los Angeles  we would like to fly next Wednesday Sunday"
+      "So my name is Johnny, and that's spelled J-O-N-N-Y, and I'm traveling with my wife, that's spelled M-C-K-E-N-Z-I-E, and we want to travel from any airport in or around San Francisco, like SFO or Oakland or San Jose, and we want to travel to Los Angeles, and we would like to fly next Wednesday through Sunday."
     )
   })
 })
@@ -161,8 +169,8 @@ describe("extractStructuredData", () => {
     expect(got).toBeDefined()
     expect(got).toEqual(
       expect.objectContaining({
-        fromAirport: ["SFO", "OAK", "SJC"],
-        toAirport: ["LAX"],
+        fromAirportCodes: ["SFO", "OAK", "SJC"],
+        toAirportCodes: ["LAX"],
         fromDate: "2023-08-09",
         toDate: "2023-08-13",
         travelers: [{ name: "Jonny" }, { name: "Mckenzie" }],
