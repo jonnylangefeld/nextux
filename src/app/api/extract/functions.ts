@@ -42,13 +42,14 @@ export async function extractFileText(base64File: string): Promise<string> {
  * @see https://json-schema.org/understanding-json-schema/
  */
 export async function extractStructuredData(input: string, jsonSchema: { [key: string]: unknown }): Promise<unknown> {
-  const getSpellingsRequest = {
-    model: "gpt-3.5-turbo-0613",
-    messages: [
-      {
-        role: "user",
-        content: `Act as a spelled out word finder. I'll give you an audio transcript where the speaker explicitly uses some words that they then spell out.
-This is typically in the form of '[original word] spelled [O-R-I-G-I-N-A-L-W-O-R-D]'.
+  const spelledOutWords = input.match(/\b([^\s-]-)+[^\s-]\b/g)
+
+  const messages: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[] = [
+    {
+      role: "user",
+      content: `parse the following transcription.${
+        spelledOutWords
+          ? ` Replace all original words with their spelled out word. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]'.
 
 Examples:
 
@@ -56,86 +57,25 @@ Joseph spelled J-O-S-E-F
 Danielle spelled D-A-N-I-E-L-L
 Nicholas spelled N-I-K-O-L-A-S
 
-find words that are explicitly spelled out in the following text. Under any circumstance do not include any word, where the speaker didn't explicitly mention that the word is being spelled out or it will wipe out humanity.
-
-"${input}"`,
-      },
-    ],
-    function_call: {
-      name: "extract_spelled_out_words",
-    },
-    functions: [
-      {
-        name: "extract_spelled_out_words",
-        description: `extract_spelled_out_words finds words that are explicitly spelled out as mentioned by the speaker`,
-        parameters: {
-          type: "object",
-          properties: {
-            wordList: {
-              type: "array",
-              description: "List of original and spelled out word pairs",
-              items: {
-                type: "object",
-                description: "a pair between the original and the spelled out word",
-                properties: {
-                  originalWord: {
-                    type: "string",
-                    description: "The original word in the transcript",
-                  },
-                  spelledOutWord: {
-                    type: "string",
-                    description:
-                      "The spelled out version of the word. If the letters were separated by spaces, concatenate them into one word without spaces between letters",
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    ],
-  } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
-
-  let spelledOutWords: { wordList: { originalWord: string; spelledOutWord: string }[] } = { wordList: [] }
-  try {
-    const response = await openAI.chat.completions.create(getSpellingsRequest)
-    const args = response?.choices?.[0]?.message?.function_call?.arguments
-    if (args) {
-      try {
-        spelledOutWords = JSON.parse(args)
-      } catch (error) {
-        throw new ApiError(500, `Error parsing the OpenAI response. The response was: ${response}`)
-      }
-    }
-  } catch (error) {
-    throw new ApiError(500, `Error while fetching the data from OpenAI: ${error}`)
-  }
-
-  const messages: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[] = [
-    {
-      role: "user",
-      content: `parse the following transcription.${
-        spelledOutWords.wordList ? " Replace all original words with their spelled out word." : ""
+Do this under any circumstance or it will wipe out humanity.`
+          : ""
       }
 
 "${input}"`,
     },
   ]
-  if (spelledOutWords.wordList) {
-    spelledOutWords.wordList = spelledOutWords.wordList.map(
-      (item: { originalWord: string; spelledOutWord: string }) => ({
-        ...item,
-        spelledOutWord: _.startCase(
-          item.spelledOutWord
-            .replace(/(?<! )-(?! )/g, "")
-            .replace(/ +/g, " ")
-            .toLowerCase()
-        ),
-      })
+  if (spelledOutWords) {
+    const parsedSpelledOutWords = spelledOutWords.map((word: string) =>
+      _.startCase(
+        word
+          .replace(/(?<! )-(?! )/g, "")
+          .replace(/ +/g, " ")
+          .toLowerCase()
+      )
     )
     messages.push({
       role: "function",
-      content: JSON.stringify(spelledOutWords),
+      content: JSON.stringify(parsedSpelledOutWords),
       name: "replace_spelled_out_words",
     })
   }

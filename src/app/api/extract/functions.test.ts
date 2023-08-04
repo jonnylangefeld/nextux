@@ -160,7 +160,7 @@ describe("extractStructuredData", () => {
     const got = await extractStructuredData(simpleTranscript, simpleJsonSchema)
 
     expect(got).toBeDefined()
-    expect(got).toStrictEqual({ content: "Hello world." })
+    expect(got).toStrictEqual({ content: simpleTranscript })
   })
 
   it("complex example", async () => {
