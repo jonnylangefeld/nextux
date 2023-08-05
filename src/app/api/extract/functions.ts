@@ -56,6 +56,7 @@ Word Examples:
 Joseph spelled J-O-S-E-F
 Danielle spelled D-A-N-I-E-L-L
 Nicholas spelled N-I-K-O-L-A-S
+petermualler@company.com that's p-e-t-e-r-m-u-e-l-l-e-r at company dot com
 
 Number Examples:
 1-2-3-4-5-6 should become 123456

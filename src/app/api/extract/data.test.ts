@@ -129,6 +129,11 @@ export const contact: useCase = {
         },
         required: ["street", "city", "state", "zipCode"],
       },
+      emailAddress: {
+        type: "string",
+        format: "email",
+        description: "the email address of the person",
+      },
       birthDate: {
         type: "string",
         description: "the date of birth of the person in YYYY-MM-DD",
@@ -138,7 +143,7 @@ export const contact: useCase = {
     required: ["firstName", "lastName", "address", "birthDate"],
   },
   transcript:
-    "Okay, so my first name is Johnny, that's spelled J-O-N-N-Y, and my last name is Langefeld, that's spelled L-A-N-G-E-F-E-L-D. And my address is 1 Ferry Building in San Francisco, California, 94105. And I'm born on July 22, 1991.",
+    "My first name is Johnny, spelled J-O-N-N-Y, and my last name is Langefeld, L-A-N-G-E-F-E-L-D. And I live in 1 Ferry Building in San Francisco, California, 94105. My email address is johnnylangefeld at gmail.com. That's J-O-N-N-Y, L-A-N-G-E-F-E-L-D at gmail.com. And I'm born on July 22, 1991.",
 }
 
 const creditCardFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/credit-card.mp3"))

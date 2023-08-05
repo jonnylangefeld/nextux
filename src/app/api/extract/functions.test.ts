@@ -138,6 +138,7 @@ describe("extractStructuredData", () => {
           stateAbbreviation: "CA",
           zipCode: "94105",
         },
+        emailAddress: "jonnylangefeld@gmail.com",
         birthDate: "1991-07-22",
       })
     )
