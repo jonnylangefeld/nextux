@@ -189,3 +189,10 @@ export const creditCard: useCase = {
   transcript:
     "My credit card number is 1-2-3-4-5-6-7-8-8-6-7-5-4-3-2-1 and my name is Johnny Langefeld that's spelled J-O-N-N-Y and then L-A-N-G-E-F-E-L-D and the expiration date is October 2024 and the CVV code is 4-3-1.",
 }
+
+const badFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/bad.mp3"))
+export const bad: useCase = {
+  fileBase64: badFileBuffer.toString("base64"),
+  jsonSchema: {},
+  transcript: "My credit card number is 1-2-3-4 and I'm 10 years old.",
+}

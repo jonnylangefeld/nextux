@@ -2,7 +2,7 @@ import NodeHttpAdapter from "@pollyjs/adapter-node-http"
 import FSPersister from "@pollyjs/persister-fs"
 import { setupPolly } from "setup-polly-jest"
 import path from "path"
-import { complex, complexLong, contact, creditCard, simple } from "./data.test"
+import { bad, complex, complexLong, contact, creditCard, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
 
 const context = setupPolly({
@@ -82,6 +82,12 @@ describe("extractFileText", () => {
 
     expect(got).toEqual(creditCard.transcript)
   })
+
+  it("should extract a bad mp3 file", async () => {
+    const got = await extractFileText(bad.fileBase64)
+
+    expect(got).toEqual(bad.transcript)
+  })
 })
 
 describe("extractStructuredData", () => {
@@ -149,6 +155,23 @@ describe("extractStructuredData", () => {
           year: 2024,
         },
         cvv: "431",
+      })
+    )
+  })
+
+  it("bad example", async () => {
+    const got = await extractStructuredData(bad.transcript, creditCard.jsonSchema)
+
+    expect(got).toBeDefined()
+    expect(got).toEqual(
+      expect.objectContaining({
+        cardNumber: "1234",
+        cardholderName: "",
+        expirationDate: {
+          month: 0,
+          year: 0,
+        },
+        cvv: "",
       })
     )
   })
