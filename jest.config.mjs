@@ -11,6 +11,7 @@ const config = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   testEnvironment: "setup-polly-jest/jest-environment-node",
   testTimeout: 60000,
+  testPathIgnorePatterns: [".*/data.test.ts"],
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

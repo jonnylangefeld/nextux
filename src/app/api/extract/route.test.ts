@@ -1,27 +1,13 @@
 import { ApiError } from "next/dist/server/api-utils"
 import { NextRequest } from "next/server"
-import fs from "fs"
-import path from "path"
 import { errors } from "@/app/lib/errors/errors"
+import { simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
 import { POST } from "./route"
 
 jest.mock("./functions")
 const extractFileTextMock = extractFileText as jest.MockedFunction<typeof extractFileText>
 const extractStructuredDataMock = extractStructuredData as jest.MockedFunction<typeof extractStructuredData>
-
-const simpleFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/simple.mp3"))
-const simpleFileBase64 = simpleFileBuffer.toString("base64")
-const simpleJsonSchema = {
-  type: "object",
-  properties: {
-    content: {
-      type: "string",
-      description: "The entire content",
-    },
-  },
-}
-const simpleJsonSchemaBase64 = Buffer.from(JSON.stringify(simpleJsonSchema)).toString("base64")
 
 describe("GET /api/extract", () => {
   afterAll(() => {
@@ -79,7 +65,10 @@ describe("GET /api/extract", () => {
   it("should throw an error if the document is not a valid base64 PDF or PNG", async () => {
     const req = new NextRequest("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ document: "foo", jsonSchema: simpleJsonSchemaBase64 }),
+      body: JSON.stringify({
+        document: "foo",
+        jsonSchema: Buffer.from(JSON.stringify(simple.jsonSchema)).toString("base64"),
+      }),
     })
 
     const got = await POST(req)
@@ -97,7 +86,10 @@ describe("GET /api/extract", () => {
     })
     const req = new NextRequest("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ document: simpleFileBase64, jsonSchema: simpleJsonSchemaBase64 }),
+      body: JSON.stringify({
+        document: simple.fileBase64,
+        jsonSchema: Buffer.from(JSON.stringify(simple.jsonSchema)).toString("base64"),
+      }),
     })
 
     const got = await POST(req)
@@ -111,7 +103,7 @@ describe("GET /api/extract", () => {
   it("should return an error if the json schema wasn't valid json", async () => {
     const req = new NextRequest("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ document: simpleFileBase64, jsonSchema: "bar" }),
+      body: JSON.stringify({ document: simple.fileBase64, jsonSchema: "bar" }),
     })
 
     const got = await POST(req)
@@ -137,7 +129,7 @@ describe("GET /api/extract", () => {
     ).toString("base64")
     const req = new NextRequest("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ document: simpleFileBase64, jsonSchema }),
+      body: JSON.stringify({ document: simple.fileBase64, jsonSchema }),
     })
 
     const got = await POST(req)
@@ -157,7 +149,10 @@ describe("GET /api/extract", () => {
     extractStructuredDataMock.mockRejectedValueOnce(new ApiError(500, "Error while fetching the data from OpenAI"))
     const req = new NextRequest("http://localhost", {
       method: "POST",
-      body: JSON.stringify({ document: simpleFileBase64, jsonSchema: simpleJsonSchemaBase64 }),
+      body: JSON.stringify({
+        document: simple.fileBase64,
+        jsonSchema: Buffer.from(JSON.stringify(simple.jsonSchema)).toString("base64"),
+      }),
     })
 
     const got = await POST(req)
