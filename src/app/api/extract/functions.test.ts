@@ -84,6 +84,7 @@ describe("extractFileText", () => {
   })
 
   it("should extract a bad mp3 file", async () => {
+    // This example was spoken without a headset. Just the microphone of the computer.
     const got = await extractFileText(bad.fileBase64)
 
     expect(got).toEqual(bad.transcript)
