@@ -2,7 +2,7 @@ import NodeHttpAdapter from "@pollyjs/adapter-node-http"
 import FSPersister from "@pollyjs/persister-fs"
 import { setupPolly } from "setup-polly-jest"
 import path from "path"
-import { complex, complexLong, simple } from "./data.test"
+import { complex, complexLong, contact, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
 
 const context = setupPolly({
@@ -70,6 +70,12 @@ describe("extractFileText", () => {
 
     expect(got).toEqual(complexLong.transcript)
   })
+
+  it("should extract a contact mp3 file", async () => {
+    const got = await extractFileText(contact.fileBase64)
+
+    expect(got).toEqual(contact.transcript)
+  })
 })
 
 describe("extractStructuredData", () => {
@@ -101,6 +107,25 @@ describe("extractStructuredData", () => {
         fromDate: "2023-08-09",
         toDate: "2023-08-13",
         travelers: [{ name: "Jonny" }, { name: "Mckenzie" }],
+      })
+    )
+  })
+
+  it("contact example", async () => {
+    const got = await extractStructuredData(contact.transcript, contact.jsonSchema)
+
+    expect(got).toBeDefined()
+    expect(got).toEqual(
+      expect.objectContaining({
+        firstName: "Jonny",
+        lastName: "Langefeld",
+        address: {
+          street: "1 Ferry Building",
+          city: "San Francisco",
+          stateAbbreviation: "CA",
+          zipCode: "94105",
+        },
+        birthDate: "1991-07-22",
       })
     )
   })
