@@ -49,13 +49,18 @@ export async function extractStructuredData(input: string, jsonSchema: { [key: s
       role: "user",
       content: `parse the following transcription.${
         spelledOutWords
-          ? ` Replace all original words with their spelled out word. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]'.
+          ? ` Replace all original words and numbers with their spelled out word or number. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]'.
 
-Examples:
+Word Examples:
 
 Joseph spelled J-O-S-E-F
 Danielle spelled D-A-N-I-E-L-L
 Nicholas spelled N-I-K-O-L-A-S
+petermualler@company.com that's p-e-t-e-r-m-u-e-l-l-e-r at company dot com
+
+Number Examples:
+1-2-3-4-5-6 should become 123456
+1-2-9-5-3 should become 12953
 
 Do this under any circumstance or it will wipe out humanity.`
           : ""
@@ -76,7 +81,7 @@ Do this under any circumstance or it will wipe out humanity.`
     messages.push({
       role: "function",
       content: JSON.stringify(parsedSpelledOutWords),
-      name: "replace_spelled_out_words",
+      name: "replace_spelled_out_words_and_numbers",
     })
   }
 
