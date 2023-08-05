@@ -140,3 +140,52 @@ export const contact: useCase = {
   transcript:
     "Okay, so my first name is Johnny, that's spelled J-O-N-N-Y, and my last name is Langefeld, that's spelled L-A-N-G-E-F-E-L-D. And my address is 1 Ferry Building in San Francisco, California, 94105. And I'm born on July 22, 1991.",
 }
+
+const creditCardFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/credit-card.mp3"))
+export const creditCard: useCase = {
+  fileBase64: creditCardFileBuffer.toString("base64"),
+  jsonSchema: {
+    type: "object",
+    description: "the fields of a credit card form",
+    required: ["cardNumber", "cardholderName", "expirationDate", "cvv"],
+    properties: {
+      cardNumber: {
+        type: "string",
+        description: "The credit card number",
+        pattern: "^[0-9]{13,19}$",
+        example: "4111111111111111",
+      },
+      cardholderName: {
+        type: "string",
+        description: "The first and last name as embossed on the card",
+        example: "John Doe",
+      },
+      expirationDate: {
+        type: "object",
+        description: "The expiration date of the credit card",
+        properties: {
+          month: {
+            type: "integer",
+            description: "the month of the credit card expiration date",
+            minimum: 1,
+            maximum: 12,
+          },
+          year: {
+            type: "integer",
+            description: "the year of the credit card expiration date",
+            examples: [2030, 2034],
+          },
+        },
+        required: ["month", "year"],
+      },
+      cvv: {
+        type: "string",
+        description: "The card verification value (usually 3 or 4 digits)",
+        pattern: "^[0-9]{3,4}$",
+        example: "123",
+      },
+    },
+  },
+  transcript:
+    "My credit card number is 1-2-3-4-5-6-7-8-8-6-7-5-4-3-2-1 and my name is Johnny Langefeld that's spelled J-O-N-N-Y and then L-A-N-G-E-F-E-L-D and the expiration date is October 2024 and the CVV code is 4-3-1.",
+}
