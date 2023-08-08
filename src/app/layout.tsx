@@ -6,6 +6,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "nextUX",
   description: "Make human input more natural",
+  content: "Make human input more natural",
   icons: {
     icon: { url: "/favicon.svg", type: "image/svg" },
     shortcut: { url: "/favicon.svg", type: "image/svg" },
