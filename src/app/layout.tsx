@@ -26,6 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#ffffff" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
+        <meta property="og:title" content="nextUX" />
+        <meta property="og:description" content="Make human input more natural" />
       </head>
       <body className={`${inter.className} text-gray-900 last:overflow-hidden dark:text-gray-200`}>{children}</body>
     </html>
