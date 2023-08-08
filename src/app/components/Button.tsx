@@ -33,6 +33,7 @@ export default function Button({ children, gradient, className, ...rest }: Props
           dark:hover:bg-primary-500
         `
         }
+        whitespace-nowrap
         rounded-md
         px-3.5
         py-2.5

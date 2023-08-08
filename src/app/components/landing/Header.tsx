@@ -11,7 +11,7 @@ export default function Header() {
     >
       <nav className="flex items-center justify-between space-x-4 p-6 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
-          <Logo className="h-10 w-64" />
+          <Logo className="h-10 w-44 md:w-56 lg:w-64" />
         </div>
 
         <div className="xs:space-x-2 flex flex-1 items-center justify-end space-x-4">

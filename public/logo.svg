@@ -14,12 +14,30 @@
         .foreground {
           fill: #000;
         }
+
+        linearGradient stop:nth-child(1) {
+          stop-color: #F20080;
+        }
+
+        linearGradient stop:nth-child(2) {
+          stop-color: #CC0066;
+        }
+
+        linearGradient stop:nth-child(3) {
+          stop-color: #4C24BD;
+        }
+
+        linearGradient stop:nth-child(4) {
+          stop-color: #4C24BD;
+        }
+
+        linearGradient stop:nth-child(5) {
+          stop-color: #20B28B;
+        }
       }
     </style>
     <linearGradient id="linear-gradient" x1="1442.82456" y1="100.81164" x2="1903.00755" y2="100.81164" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#9fb1ea"/>
-      <stop offset=".02407" stop-color="#91a3e9"/>
-      <stop offset=".05597" stop-color="#8599e8"/>
       <stop offset=".09" stop-color="#8296e8"/>
       <stop offset=".42" stop-color="#26a0eb"/>
       <stop offset=".47" stop-color="#48aeec"/>
