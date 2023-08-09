@@ -28,6 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#ffffff" />
         <meta property="og:title" content="nextUX" />
         <meta property="og:description" content="Make human input more natural" />
+        <meta property="og:url" content="https://nextux.ai" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:site_name" content="nextUX" />
+        <meta property="og:type" content="website" />
       </head>
       <body className={`${inter.className} text-gray-900 last:overflow-hidden dark:text-gray-200`}>{children}</body>
     </html>
