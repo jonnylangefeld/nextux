@@ -6,9 +6,9 @@ import Section from "./Section"
 export default function Hero() {
   return (
     <Section>
-      <div className="mx-auto max-w-2xl">
-        <div className="text-center">
-          <div className="text-4xl font-bold tracking-tight sm:text-6xl">
+      <div className="flex h-screen items-center">
+        <div className="max-w-lg text-center">
+          <div className="xs:text-5xl text-4xl font-bold tracking-tight sm:text-6xl">
             Make <Highlight>human</Highlight> input more <Highlight>natural</Highlight>
           </div>
           <div className="mt-10 flex items-center justify-center gap-x-6">
