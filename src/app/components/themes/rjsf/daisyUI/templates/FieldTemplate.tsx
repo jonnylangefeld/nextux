@@ -1,17 +1,22 @@
 import { FieldTemplateProps } from "@rjsf/utils"
 
 export default function FieldTemplate(props: FieldTemplateProps) {
+  console.log(props.description)
   return (
-    <div className="flex flex-row items-center gap-x-3" style={props.style}>
+    <div className="form-control" style={props.style}>
       {props.displayLabel && (
-        <label className="label label-text" htmlFor={props.id}>
+        <label className="label label-text">
           {props.label}
           {props.required ? "*" : null}
         </label>
       )}
-      {props.description}
       {props.children}
-      {props.errors}
+      {(props.description?.props.description || props.errors?.props.errors) && (
+        <label className="label">
+          <span className="label-text-alt">{props.description}</span>
+          <span className="label-text-alt">{props.errors}</span>
+        </label>
+      )}
       {props.help}
     </div>
   )
