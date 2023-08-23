@@ -1,25 +1,13 @@
 import React from "react"
 import Frame from "./Frame"
+import MagicForm from "./MagicForm"
 import Section from "./Section"
 
 export default function Hero() {
   return (
-    <Section className="-mt-40 ">
+    <Section className="z-10 -mt-40" id="demo">
       <Frame>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
-        <div>content</div>
+        <MagicForm />
       </Frame>
     </Section>
   )
