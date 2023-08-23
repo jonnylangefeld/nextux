@@ -2,7 +2,7 @@
 
 import Form from "@rjsf/core"
 import { getDefaultRegistry } from "@rjsf/core"
-import { FieldTemplateProps, RJSFSchema, TitleFieldProps, WidgetProps } from "@rjsf/utils"
+import { FieldTemplateProps, ObjectFieldTemplateProps, RJSFSchema, TitleFieldProps, WidgetProps } from "@rjsf/utils"
 import { BaseInputTemplateProps } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 
@@ -28,13 +28,13 @@ export default function MagicForm() {
     <Form
       schema={schema}
       validator={validator}
-      className="form-control"
+      className="form-control w-full max-w-xl gap-y-2"
       templates={{
         BaseInputTemplate: (props: BaseInputTemplateProps) => (
           <templates.BaseInputTemplate className="input-bordered input w-full" {...props} />
         ),
         FieldTemplate: (props: FieldTemplateProps) => (
-          <div className="mb-2 flex flex-row items-center gap-x-3" style={props.style}>
+          <div className="flex flex-row items-center gap-x-3" style={props.style}>
             {props.displayLabel && (
               <label className="label label-text" htmlFor={props.id}>
                 {props.label}
@@ -45,6 +45,13 @@ export default function MagicForm() {
             {props.children}
             {props.errors}
             {props.help}
+          </div>
+        ),
+        ObjectFieldTemplate: (props: ObjectFieldTemplateProps) => (
+          <div className="flex w-full flex-col gap-y-2">
+            <div className="mb-3 text-2xl">{props.title}</div>
+            {props.description}
+            {props.properties.map((element) => element.content)}
           </div>
         ),
         TitleFieldTemplate: (props: TitleFieldProps) => {
