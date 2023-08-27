@@ -1,7 +1,6 @@
 import { FieldTemplateProps } from "@rjsf/utils"
 
 export default function FieldTemplate(props: FieldTemplateProps) {
-  console.log(props.description)
   return (
     <div className="form-control" style={props.style}>
       {props.displayLabel && (
@@ -13,7 +12,7 @@ export default function FieldTemplate(props: FieldTemplateProps) {
       {props.children}
       {(props.description?.props.description || props.errors?.props.errors) && (
         <label className="label">
-          <span className="label-text-alt">{props.description}</span>
+          {/* <span className="label-text-alt">{props.description}</span> */}
           <span className="label-text-alt">{props.errors}</span>
         </label>
       )}

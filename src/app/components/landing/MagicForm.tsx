@@ -3,40 +3,170 @@
 import { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
+import Image from "next/image"
+import { useState } from "react"
 import daisyUI from "../themes/rjsf/daisyUI"
 
 const ThemedForm = withTheme(daisyUI)
 
 const schema: RJSFSchema = {
-  title: "Todo",
   type: "object",
-  required: ["foo"],
+  description: "The personal data typically put into a contact form",
   properties: {
-    foo: {
+    firstName: {
+      title: "First Name",
       type: "string",
-      title: "Foo",
-      default: "A new taskA new taskA new taskA new taskA new taskA new task",
+      description: "the first name of the person",
     },
-    bar: { type: "string", title: "Bar", default: "A new task" },
-    foobar: {
+    lastName: {
+      title: "Last Name",
+      type: "string",
+      description: "the first name of the person",
+    },
+    address: {
       type: "object",
+      title: "Address",
+      description: "the home address of the person",
       properties: {
-        a: {
+        street: {
+          title: "Street",
           type: "string",
-          description: "A description",
-          title: "A",
+          description: "the street of the address including the street number",
         },
-        b: {
+        city: {
+          title: "City",
           type: "string",
+          description:
+            "the city of the address. Use your knowledge about cities and their zip codes to get the right one",
+        },
+        stateAbbreviation: {
+          title: "State",
+          type: "string",
+          description: "the two letter state abbreviation of the address",
+          pattern: "^[A-Z]{2}$",
+          enum: [
+            "AL",
+            "AK",
+            "AZ",
+            "AR",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "FL",
+            "GA",
+            "HI",
+            "ID",
+            "IL",
+            "IN",
+            "IA",
+            "KS",
+            "KY",
+            "LA",
+            "ME",
+            "MD",
+            "MA",
+            "MI",
+            "MN",
+            "MS",
+            "MO",
+            "MT",
+            "NE",
+            "NV",
+            "NH",
+            "NJ",
+            "NM",
+            "NY",
+            "NC",
+            "ND",
+            "OH",
+            "OK",
+            "OR",
+            "PA",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VT",
+            "VA",
+            "WA",
+            "WV",
+            "WI",
+            "WY",
+          ],
+        },
+        zipCode: {
+          title: "Zip Code",
+          type: "string",
+          description: "the zip code of the address",
+          pattern: "^\\d{5}$",
         },
       },
+      required: ["street", "city", "state", "zipCode"],
     },
-    done: { type: "boolean", title: "Done?", default: false },
+    emailAddress: {
+      title: "Email Address",
+      type: "string",
+      format: "email",
+      description: "the email address of the person",
+    },
+    birthDate: {
+      title: "Birth Date",
+      type: "string",
+      description: "the date of birth of the person in YYYY-MM-DD",
+      pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+    },
   },
+  required: ["firstName", "lastName", "address", "birthDate"],
 }
 
 export default function MagicForm() {
+  const [recording, setRecording] = useState(false)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+
+  const handleRecording = () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      console.log("WebRTC not supported")
+      return
+    }
+
+    if (recording && mediaRecorder) {
+      mediaRecorder.stop()
+      setRecording(false)
+    } else {
+      // Request permission and start recording only when the button is clicked
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          const newMediaRecorder = new MediaRecorder(stream)
+          newMediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+              // Save the audio blob here or handle it however you like
+              console.log(event.data)
+            }
+          }
+          newMediaRecorder.start()
+          setMediaRecorder(newMediaRecorder)
+          setRecording(true)
+        })
+        .catch((err) => {
+          console.log("Permission denied", err)
+        })
+    }
+  }
+
   return (
-    <ThemedForm schema={schema} validator={validator} className="form-control w-full max-w-xl gap-y-2"></ThemedForm>
+    <div className="flex w-full max-w-xl flex-col gap-y-2">
+      <div className="flex flex-row items-center justify-between">
+        <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
+        <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
+          <div className="absolute h-full w-full scale-100 rounded-md bg-white blur-lg" />
+          <Image src="icon.svg" alt="nextux buttler icon" fill />
+        </div>
+      </div>
+      <ThemedForm schema={schema} validator={validator} className="form-control w-full gap-y-2"></ThemedForm>
+    </div>
   )
 }
