@@ -5,6 +5,7 @@ import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import Image from "next/image"
 import { useState } from "react"
+import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
 
 const ThemedForm = withTheme(daisyUI)
@@ -134,6 +135,10 @@ export default function MagicForm() {
 
     if (recording && mediaRecorder) {
       mediaRecorder.stop()
+
+      // Stop all tracks to ensure that the microphone is released
+      mediaRecorder.stream.getTracks().forEach((track) => track.stop())
+
       setRecording(false)
     } else {
       // Request permission and start recording only when the button is clicked
@@ -141,10 +146,30 @@ export default function MagicForm() {
         .getUserMedia({ audio: true })
         .then((stream) => {
           const newMediaRecorder = new MediaRecorder(stream)
-          newMediaRecorder.ondataavailable = (event) => {
+          newMediaRecorder.ondataavailable = async (event) => {
             if (event.data.size > 0) {
-              // Save the audio blob here or handle it however you like
-              console.log(event.data)
+              const reader = new FileReader()
+
+              reader.onloadend = async function () {
+                if (reader.result) {
+                  const base64Audio = (reader.result as string).split(",")[1] // Splitting to get only the Base64 data
+
+                  const body: ExtractRequest = {
+                    jsonSchema: Buffer.from(JSON.stringify(schema)).toString("base64"),
+                    document: base64Audio,
+                  }
+
+                  await fetch("/api/extract", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(body),
+                  })
+                }
+              }
+
+              reader.readAsDataURL(event.data)
             }
           }
           newMediaRecorder.start()
@@ -159,7 +184,7 @@ export default function MagicForm() {
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-y-2">
-      <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row items-start justify-between">
         <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
         <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
           <div className="absolute h-full w-full scale-100 rounded-md bg-white blur-lg" />

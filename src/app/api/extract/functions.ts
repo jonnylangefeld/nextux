@@ -25,7 +25,7 @@ export async function extractFileText(base64File: string): Promise<string> {
   const buffer = Buffer.from(base64File, "base64")
   const transcriptionRequest = {
     model: "whisper-1",
-    file: await toFile(buffer, "audio.mp3"),
+    file: await toFile(buffer, "audio.webm"),
     response_format: "json",
   } as OpenAI.Audio.Transcriptions.TranscriptionCreateParams
   const response = await openAI.audio.transcriptions.create(transcriptionRequest)
