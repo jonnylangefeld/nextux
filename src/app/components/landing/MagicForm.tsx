@@ -105,7 +105,7 @@ const schema: RJSFSchema = {
           pattern: "^\\d{5}$",
         },
       },
-      required: ["street", "city", "state", "zipCode"],
+      required: ["street", "city", "stateAbbreviation", "zipCode"],
     },
     emailAddress: {
       title: "Email Address",
@@ -124,6 +124,7 @@ const schema: RJSFSchema = {
 }
 
 export default function MagicForm() {
+  const [formData, setFormData] = useState({})
   const [recording, setRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
 
@@ -159,13 +160,15 @@ export default function MagicForm() {
                     document: base64Audio,
                   }
 
-                  await fetch("/api/extract", {
+                  const resp = await fetch("/api/extract", {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
                     },
                     body: JSON.stringify(body),
                   })
+                  console.log(resp)
+                  setFormData(await resp.json())
                 }
               }
 
@@ -191,7 +194,13 @@ export default function MagicForm() {
           <Image src="icon.svg" alt="nextux buttler icon" fill />
         </div>
       </div>
-      <ThemedForm schema={schema} validator={validator} className="form-control w-full gap-y-2"></ThemedForm>
+      <ThemedForm
+        formData={formData}
+        schema={schema}
+        validator={validator}
+        className="form-control w-full gap-y-2"
+        onSubmit={(e) => console.log(e)}
+      ></ThemedForm>
     </div>
   )
 }

@@ -49,13 +49,15 @@ export async function extractStructuredData(input: string, jsonSchema: { [key: s
       role: "user",
       content: `parse the following transcription.${
         spelledOutWords
-          ? ` Replace all original words and numbers with their spelled out word or number. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]'.
+          ? ` Replace all original words and numbers with their spelled out word or number. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]', or '[original word], [S-P-E-L-L-E-D-W-O-R-D]'.
 
 Word Examples:
 
 Joseph spelled J-O-S-E-F
 Danielle spelled D-A-N-I-E-L-L
 Nicholas spelled N-I-K-O-L-A-S
+Peter, P-E-T-E-R
+Zucerberg, Z-U-C-K-E-R-B-E-R-G
 petermualler@company.com that's p-e-t-e-r-m-u-e-l-l-e-r at company dot com
 
 Number Examples:
