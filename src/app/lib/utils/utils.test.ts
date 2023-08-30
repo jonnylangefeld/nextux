@@ -11,6 +11,13 @@ describe("isBase64FileType", () => {
     expect(result).toBe(true)
   })
 
+  it("should correctly identify a valid base64 WEBM", async () => {
+    const webmBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/contact.webm"))
+    const base64Webm = webmBuffer.toString("base64")
+    const result = isBase64FileType(base64Webm, FileType.WEBM)
+    expect(result).toBe(true)
+  })
+
   it("should return false for an invalid file type", async () => {
     const invalidBuffer = Buffer.from("invalid-base64-string")
     const base64Invalid = invalidBuffer.toString("base64")
