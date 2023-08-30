@@ -1,7 +1,6 @@
 import { WidgetProps } from "@rjsf/utils"
 
 export default function SelectWidget(props: WidgetProps) {
-  console.log("SelectWidget", props.options.enumOptions)
   return (
     <select
       id={props.id}
@@ -17,8 +16,8 @@ export default function SelectWidget(props: WidgetProps) {
       onChange={props.handleChange}
     >
       {!props.multiple && props.schema.default === undefined && <option value="">{props.placeholder}</option>}
-      {Array.isArray(props.enumOptions) &&
-        props.enumOptions.map(({ value, label }, i) => {
+      {Array.isArray(props.options.enumOptions) &&
+        props.options.enumOptions.map(({ value, label }, i) => {
           const disabled = props.enumDisabled && props.enumDisabled.indexOf(value) !== -1
           return (
             <option key={i} value={String(i)} disabled={disabled}>
