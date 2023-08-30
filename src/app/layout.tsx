@@ -7,10 +7,6 @@ export const metadata = {
   title: "nextUX",
   description: "Make human input more natural",
   content: "Make human input more natural",
-  icons: {
-    icon: { url: "/favicon.svg", type: "image/svg" },
-    shortcut: { url: "/favicon.svg", type: "image/svg" },
-  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -33,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:site_name" content="nextUX" />
         <meta property="og:type" content="website" />
       </head>
-      <body className={`${inter.className} text-gray-900 last:overflow-hidden dark:text-gray-200`}>{children}</body>
+      <body className={`${inter.className} text-gray-900 dark:text-gray-200`}>{children}</body>
     </html>
   )
 }
