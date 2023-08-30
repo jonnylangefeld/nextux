@@ -11,21 +11,23 @@ export default function Hero() {
   const screenRef: React.RefObject<HTMLDivElement> = useRef(null)
   const contentRef: React.RefObject<HTMLDivElement> = useRef(null)
 
-  useEffect(() => {
-    let max = 0
-    const handleScroll = () => {
-      const screenBottom = screenRef.current?.getBoundingClientRect().bottom || 0
-      const contentBottom = contentRef.current?.getBoundingClientRect().bottom || 0
-      if (screenBottom >= max) {
-        setItems("fixed items-center")
-        setTranslate("")
-      }
-      if (screenBottom - 160 < contentBottom) {
-        max = Math.max(max, screenBottom)
-        setItems("absolute items-end")
-        setTranslate("translate-y-[-10rem]")
-      }
+  const updateClasses = (threshold: number) => {
+    const screenBottom = screenRef.current?.getBoundingClientRect().bottom || 0
+    if (screenBottom >= threshold) {
+      setItems("fixed items-center")
+      setTranslate("")
     }
+    if (screenBottom - 160 < threshold) {
+      // 160 is 10rem
+      setItems("absolute items-end")
+      setTranslate("translate-y-[-10rem]")
+    }
+  }
+
+  useEffect(() => {
+    const threshold = contentRef.current?.getBoundingClientRect().bottom || 0
+    updateClasses(threshold)
+    const handleScroll = () => updateClasses(threshold)
     window.addEventListener("scroll", handleScroll)
     return () => {
       window.removeEventListener("scroll", handleScroll)
