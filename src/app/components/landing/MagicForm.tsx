@@ -255,7 +255,7 @@ export default function MagicForm() {
       <div className="flex flex-row items-start justify-between">
         <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
         <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
-          {/* <div className="absolute h-full w-full scale-100 rounded-md bg-white blur-lg" /> */}
+          <div className="absolute -z-10 h-full w-full scale-100 rounded-md bg-white blur-lg" />
           <RiveComponent />
         </div>
       </div>
