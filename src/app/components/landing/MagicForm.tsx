@@ -1,9 +1,9 @@
 "use client"
 
+import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
-import Image from "next/image"
 import { useState } from "react"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
@@ -127,12 +127,28 @@ export default function MagicForm() {
   const [formData, setFormData] = useState({})
   const [recording, setRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const { rive, RiveComponent } = useRive({
+    src: "/formbuttler.riv",
+    stateMachines: "recording",
+    autoplay: true,
+  })
+  const animateStart = useStateMachineInput(rive, "recording", "start")
+  const animateStop = useStateMachineInput(rive, "recording", "stop")
+  const animateUploaded = useStateMachineInput(rive, "recording", "uploaded")
+  const animateCenter = useStateMachineInput(rive, "recording", "center")
+  const animateLeft = useStateMachineInput(rive, "recording", "left")
+  const animateRight = useStateMachineInput(rive, "recording", "right")
 
   const handleRecording = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       console.log("WebRTC not supported")
       return
     }
+
+    const audioContext = new AudioContext()
+    const analyser = audioContext.createAnalyser()
+    analyser.fftSize = 256 // Reducing FFT size for quicker analysis
+    analyser.smoothingTimeConstant = 0.1
 
     if (recording && mediaRecorder) {
       mediaRecorder.stop()
@@ -147,8 +163,55 @@ export default function MagicForm() {
         .getUserMedia({ audio: true })
         .then((stream) => {
           const newMediaRecorder = new MediaRecorder(stream)
+
+          const source = audioContext.createMediaStreamSource(stream)
+          source.connect(analyser)
+
+          const dataArray = new Uint8Array(analyser.frequencyBinCount)
+
+          // Check amplitude periodically
+          const interval = setInterval(() => {
+            analyser.getByteFrequencyData(dataArray)
+
+            const maxRelevantIndex = 55
+            const segmentSize = Math.floor(maxRelevantIndex / 3)
+
+            const segments = [
+              dataArray.slice(0, segmentSize),
+              dataArray.slice(segmentSize, 2 * segmentSize),
+              dataArray.slice(2 * segmentSize, maxRelevantIndex),
+            ]
+
+            const barValues = segments.map((segment) => {
+              // Get the max value for each segment
+              const max = Math.max(...Array.from(segment))
+              // Normalize the value to be between 0 and 100
+              return (max / 255) * 100
+            })
+
+            const center = barValues[0]
+            const left = barValues[1]
+            const right = barValues[2]
+
+            if (animateCenter) {
+              animateCenter.value = center
+            }
+            if (animateLeft) {
+              animateLeft.value = left
+            }
+            if (animateRight) {
+              animateRight.value = right
+            }
+          }, 50)
+
+          // Stop checking when recording stops
+          newMediaRecorder.onstop = () => {
+            clearInterval(interval)
+          }
+
           newMediaRecorder.ondataavailable = async (event) => {
             if (event.data.size > 0) {
+              animateStop?.fire()
               const reader = new FileReader()
 
               reader.onloadend = async function () {
@@ -167,8 +230,9 @@ export default function MagicForm() {
                     },
                     body: JSON.stringify(body),
                   })
-                  console.log(resp)
                   setFormData(await resp.json())
+
+                  animateUploaded?.fire()
                 }
               }
 
@@ -178,6 +242,7 @@ export default function MagicForm() {
           newMediaRecorder.start()
           setMediaRecorder(newMediaRecorder)
           setRecording(true)
+          animateStart?.fire()
         })
         .catch((err) => {
           console.log("Permission denied", err)
@@ -190,8 +255,8 @@ export default function MagicForm() {
       <div className="flex flex-row items-start justify-between">
         <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
         <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
-          <div className="absolute h-full w-full scale-100 rounded-md bg-white blur-lg" />
-          <Image src="icon.svg" alt="nextux buttler icon" fill />
+          {/* <div className="absolute h-full w-full scale-100 rounded-md bg-white blur-lg" /> */}
+          <RiveComponent />
         </div>
       </div>
       <ThemedForm
