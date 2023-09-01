@@ -4,10 +4,12 @@ import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
-import { set } from "lodash"
 import { useEffect, useState } from "react"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
+
+const initialToolTipMessages = ["Click the FormButtler icon to help you fill out this form", "Try it out!"]
+const tooltipDuration = 5000
 
 const ThemedForm = withTheme(daisyUI)
 
@@ -124,8 +126,6 @@ const schema: RJSFSchema = {
   required: ["firstName", "lastName", "address", "birthDate"],
 }
 
-const initialToolTipMessages = ["Click the FormButtler icon to help you fill out this form", "Try it out!"]
-
 export default function MagicForm() {
   const [formData, setFormData] = useState({})
   const [recording, setRecording] = useState(false)
@@ -151,13 +151,9 @@ export default function MagicForm() {
     const intervalId = setInterval(() => {
       setTooltipText(messages[i])
       i = (i + 1) % messages.length
-    }, 5000)
+    }, tooltipDuration)
     return intervalId
   }
-
-  useEffect(() => {
-    console.log("Tooltip State:", tooltipOpen)
-  }, [tooltipOpen])
 
   useEffect(() => {
     const intervalId = cycleTooltips(tooltipMessages)
