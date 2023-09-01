@@ -4,9 +4,12 @@ import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
+
+const initialToolTipMessages = ["Click the FormButtler icon to help you fill out this form", "Try it out!"]
+const tooltipDuration = 5000
 
 const ThemedForm = withTheme(daisyUI)
 
@@ -126,6 +129,10 @@ const schema: RJSFSchema = {
 export default function MagicForm() {
   const [formData, setFormData] = useState({})
   const [recording, setRecording] = useState(false)
+  const [tooltipOpen, setTooltipOpen] = useState(true)
+  const [tooltipText, setTooltipText] = useState(initialToolTipMessages[0])
+  const [tooltipMessages, setTooltipMessages] = useState<string[]>(initialToolTipMessages)
+  const [tooltipCycler, setTooltipCycler] = useState<NodeJS.Timer | null>(null)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const { rive, RiveComponent } = useRive({
     src: "/formbuttler.riv",
@@ -138,6 +145,25 @@ export default function MagicForm() {
   const animateCenter = useStateMachineInput(rive, "recording", "center")
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
+
+  const cycleTooltips = (messages: string[]) => {
+    let i = 0
+    const intervalId = setInterval(() => {
+      setTooltipText(messages[i])
+      i = (i + 1) % messages.length
+    }, tooltipDuration)
+    return intervalId
+  }
+
+  useEffect(() => {
+    const intervalId = cycleTooltips(tooltipMessages)
+    setTooltipCycler(intervalId)
+
+    // Cleanup the interval on unmount
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [tooltipMessages])
 
   const handleRecording = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -170,7 +196,7 @@ export default function MagicForm() {
           const dataArray = new Uint8Array(analyser.frequencyBinCount)
 
           // Check amplitude periodically
-          const interval = setInterval(() => {
+          const animateFrequencies = setInterval(() => {
             analyser.getByteFrequencyData(dataArray)
 
             const maxRelevantIndex = 55
@@ -204,9 +230,20 @@ export default function MagicForm() {
             }
           }, 50)
 
+          setTooltipMessages([
+            "You can talk like you normally would with a friend or colleague",
+            "It helps to spell out names like you would in a phone call",
+            "You can say things like 'my name is Peter, that's P-E-T-E-R'",
+          ])
+
           // Stop checking when recording stops
           newMediaRecorder.onstop = () => {
-            clearInterval(interval)
+            clearInterval(animateFrequencies)
+            if (tooltipCycler) {
+              clearInterval(tooltipCycler)
+            }
+            setTooltipOpen(false)
+            console.log("Stopped recording")
           }
 
           newMediaRecorder.ondataavailable = async (event) => {
@@ -233,6 +270,9 @@ export default function MagicForm() {
                   setFormData(await resp.json())
 
                   animateUploaded?.fire()
+                  setTooltipOpen(true)
+                  setTooltipText(initialToolTipMessages[0])
+                  setTooltipMessages(initialToolTipMessages)
                 }
               }
 
@@ -243,6 +283,7 @@ export default function MagicForm() {
           setMediaRecorder(newMediaRecorder)
           setRecording(true)
           animateStart?.fire()
+          setTooltipText("Start speaking to fill out this form")
         })
         .catch((err) => {
           console.log("Permission denied", err)
@@ -254,9 +295,14 @@ export default function MagicForm() {
     <div className="flex w-full max-w-xl flex-col gap-y-2">
       <div className="flex flex-row items-start justify-between">
         <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
-        <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
-          <div className="absolute -z-10 h-full w-full scale-100 rounded-md bg-white blur-lg" />
-          <RiveComponent />
+        <div
+          className={`${tooltipOpen ? "tooltip-open" : ""} tooltip tooltip-left xl:tooltip-top`}
+          data-tip={tooltipText}
+        >
+          <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
+            <div className="absolute -z-20 h-full w-full scale-100 rounded-md bg-white blur-lg" />
+            <RiveComponent />
+          </div>
         </div>
       </div>
       <ThemedForm

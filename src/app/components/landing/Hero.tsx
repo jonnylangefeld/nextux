@@ -43,11 +43,11 @@ export default function Hero() {
             Make <Highlight>human</Highlight> input more <Highlight>natural</Highlight>
           </div>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <a href="/docs/quick-start" target="_blank">
-              <Button gradient className="btn">
-                Get Started 🚀
-              </Button>
-            </a>
+            {/* <a href="/" target="_blank"> */}
+            <Button gradient className="btn">
+              Get Started 🚀
+            </Button>
+            {/* </a> */}
           </div>
         </div>
       </div>
