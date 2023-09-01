@@ -295,7 +295,10 @@ export default function MagicForm() {
     <div className="flex w-full max-w-xl flex-col gap-y-2">
       <div className="flex flex-row items-start justify-between">
         <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
-        <div className={`${tooltipOpen ? "tooltip-open" : ""} tooltip tooltip-top`} data-tip={tooltipText}>
+        <div
+          className={`${tooltipOpen ? "tooltip-open" : ""} tooltip tooltip-left xl:tooltip-top`}
+          data-tip={tooltipText}
+        >
           <div className="relative aspect-square w-[40px] cursor-pointer md:w-[40px]" onClick={handleRecording}>
             <div className="absolute -z-20 h-full w-full scale-100 rounded-md bg-white blur-lg" />
             <RiveComponent />
