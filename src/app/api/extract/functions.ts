@@ -53,12 +53,13 @@ export async function extractStructuredData(input: string, jsonSchema: { [key: s
 
 Word Examples:
 
-Joseph spelled J-O-S-E-F
-Danielle spelled D-A-N-I-E-L-L
-Nicholas spelled N-I-K-O-L-A-S
-Peter, P-E-T-E-R
-Zucerberg, Z-U-C-K-E-R-B-E-R-G
-petermualler@company.com that's p-e-t-e-r-m-u-e-l-l-e-r at company dot com
+"Joseph spelled J-O-S-E-F" should become Josef
+"Danielle spelled D-A-N-I-E-L-L" should become Daniell
+"Nicholas spelled N-I-K-O-L-A-S" should become Nikolas
+"Peter, P-E-T-E-R" should become Peter
+"Zucerberg, Z-U-C-K-E-R-B-E-R-G" should become Zuckerberg
+"petermualler that's p-e-t-e-r-m-u-e-l-l-e-r" should become petermueller
+"johnnyleinfeld at gmail.com. That's J-O-N-N-Y-L-A-N-G-E-F-E-L-D at gmail.com" should become jonnylangefeld at gmail.com
 
 Number Examples:
 1-2-3-4-5-6 should become 123456
@@ -99,6 +100,7 @@ Do this under any circumstance or it will wipe out humanity.`
         name: "parse_transcription",
         description: `parse_transcription is an AI document extractor. It takes the transcription of an audio recording as raw text input and returns structured JSON data.
         Some information may be scattered across the recording in which case this function will piece it together.
+        Under no circumstance use or add any information that is not present in the recording or it will wipe out humanity.
         If a relative date is given such as 'next Monday', calculate from ${now.toLocaleString()}.`,
         parameters: jsonSchema,
       },
