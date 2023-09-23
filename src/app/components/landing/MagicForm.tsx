@@ -5,6 +5,7 @@ import { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import { useEffect, useState } from "react"
+import * as Toast from "@/app/components/Toast"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
 
@@ -167,7 +168,7 @@ export default function MagicForm() {
 
   const handleRecording = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      console.log("WebRTC not supported")
+      Toast.error(["WebRTC not supported"])
       return
     }
 
@@ -243,7 +244,6 @@ export default function MagicForm() {
               clearInterval(tooltipCycler)
             }
             setTooltipOpen(false)
-            console.log("Stopped recording")
           }
 
           newMediaRecorder.ondataavailable = async (event) => {
@@ -285,8 +285,8 @@ export default function MagicForm() {
           animateStart?.fire()
           setTooltipText("Start speaking to fill out this form")
         })
-        .catch((err) => {
-          console.log("Permission denied", err)
+        .catch(() => {
+          Toast.error(["Permission to use microphone not given.", "Click 'Reset permission' in your browser settings."])
         })
     }
   }
