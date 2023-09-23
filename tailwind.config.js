@@ -24,6 +24,30 @@ module.exports = {
       transitionTimingFunction: {
         "background-polygon": "cubic-bezier(.5,.1,.5,.9)",
       },
+      animation: {
+        "swipe-in": "swipe-in 0.3s ease-out",
+        "dissolve-out": "dissolve-out 0.3s ease-in forwards",
+      },
+      keyframes: {
+        "swipe-in": {
+          "0%": {
+            transform: "translateX(100%)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+        },
+        "dissolve-out": {
+          "0%": {
+            opacity: "1",
+          },
+          "100%": {
+            opacity: "0",
+          },
+        },
+      },
     },
   },
   plugins: [require("daisyui"), require("@tailwindcss/typography")],

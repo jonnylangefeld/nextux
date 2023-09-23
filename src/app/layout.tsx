@@ -1,5 +1,6 @@
 import "./globals.css"
 import { Inter } from "next/font/google"
+import { Toaster } from "react-hot-toast"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,7 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta property="og:site_name" content="nextUX" />
         <meta property="og:type" content="website" />
       </head>
-      <body className={`${inter.className} text-gray-900 dark:text-gray-200`}>{children}</body>
+      <body className={`${inter.className} text-gray-900 dark:text-gray-200`}>
+        <Toaster position="bottom-right" />
+        {children}
+      </body>
     </html>
   )
 }
