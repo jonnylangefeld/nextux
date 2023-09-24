@@ -14,120 +14,11 @@ const tooltipDuration = 5000
 
 const ThemedForm = withTheme(daisyUI)
 
-const schema: RJSFSchema = {
-  type: "object",
-  description: "The personal data typically put into a contact form",
-  properties: {
-    firstName: {
-      title: "First Name",
-      type: "string",
-      description: "the first name of the person",
-    },
-    lastName: {
-      title: "Last Name",
-      type: "string",
-      description: "the first name of the person",
-    },
-    address: {
-      type: "object",
-      title: "Address",
-      description: "the home address of the person",
-      properties: {
-        street: {
-          title: "Street",
-          type: "string",
-          description: "the street of the address including the street number",
-        },
-        city: {
-          title: "City",
-          type: "string",
-          description:
-            "the city of the address. Use your knowledge about cities and their zip codes to get the right one",
-        },
-        stateAbbreviation: {
-          title: "State",
-          type: "string",
-          description: "the two letter state abbreviation of the address",
-          pattern: "^[A-Z]{2}$",
-          enum: [
-            "AL",
-            "AK",
-            "AZ",
-            "AR",
-            "CA",
-            "CO",
-            "CT",
-            "DE",
-            "FL",
-            "GA",
-            "HI",
-            "ID",
-            "IL",
-            "IN",
-            "IA",
-            "KS",
-            "KY",
-            "LA",
-            "ME",
-            "MD",
-            "MA",
-            "MI",
-            "MN",
-            "MS",
-            "MO",
-            "MT",
-            "NE",
-            "NV",
-            "NH",
-            "NJ",
-            "NM",
-            "NY",
-            "NC",
-            "ND",
-            "OH",
-            "OK",
-            "OR",
-            "PA",
-            "RI",
-            "SC",
-            "SD",
-            "TN",
-            "TX",
-            "UT",
-            "VT",
-            "VA",
-            "WA",
-            "WV",
-            "WI",
-            "WY",
-          ],
-        },
-        zipCode: {
-          title: "Zip Code",
-          type: "string",
-          description: "the zip code of the address",
-          pattern: "^\\d{5}$",
-        },
-      },
-      required: ["street", "city", "stateAbbreviation", "zipCode"],
-    },
-    emailAddress: {
-      title: "Email Address",
-      type: "string",
-      format: "email",
-      description: "the email address of the person",
-    },
-    birthDate: {
-      title: "Birth Date",
-      type: "string",
-      description: "the date of birth of the person in YYYY-MM-DD",
-      pattern: "^\\d{4}-\\d{2}-\\d{2}$",
-    },
-  },
-  required: ["firstName", "lastName", "address", "birthDate"],
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+  schema: RJSFSchema
 }
 
-export default function MagicForm() {
+export default function MagicForm(props: Props) {
   const [formData, setFormData] = useState({})
   const [recording, setRecording] = useState(false)
   const [tooltipOpen, setTooltipOpen] = useState(true)
@@ -147,6 +38,59 @@ export default function MagicForm() {
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
 
+  const apiRequest = async (body: ExtractRequest) => {
+    if (process.env.NEXT_PUBLIC_SKIP_API_CALLS === "true") {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      Toast.info(["Dev mode: API call skipped"])
+      return
+    }
+    const resp = await fetch("/api/extract", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+    setFormData(await resp.json())
+  }
+
+  const animateFrequencies = (analyser: AnalyserNode) => {
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    return setInterval(() => {
+      analyser.getByteFrequencyData(dataArray)
+
+      const maxRelevantIndex = 55
+      const segmentSize = Math.floor(maxRelevantIndex / 3)
+
+      const segments = [
+        dataArray.slice(0, segmentSize),
+        dataArray.slice(segmentSize, 2 * segmentSize),
+        dataArray.slice(2 * segmentSize, maxRelevantIndex),
+      ]
+
+      const barValues = segments.map((segment) => {
+        // Get the max value for each segment
+        const max = Math.max(...Array.from(segment))
+        // Normalize the value to be between 0 and 100
+        return (max / 255) * 100
+      })
+
+      const center = barValues[0]
+      const left = barValues[1]
+      const right = barValues[2]
+
+      if (animateCenter) {
+        animateCenter.value = center
+      }
+      if (animateLeft) {
+        animateLeft.value = left
+      }
+      if (animateRight) {
+        animateRight.value = right
+      }
+    }, 50)
+  }
+
   const cycleTooltips = (messages: string[]) => {
     let i = 0
     const intervalId = setInterval(() => {
@@ -156,15 +100,68 @@ export default function MagicForm() {
     return intervalId
   }
 
-  useEffect(() => {
-    const intervalId = cycleTooltips(tooltipMessages)
-    setTooltipCycler(intervalId)
-
-    // Cleanup the interval on unmount
-    return () => {
-      clearInterval(intervalId)
+  const addStopEvents = (mediaRecorder: MediaRecorder, animateFrequenciesInterval: NodeJS.Timer) => {
+    mediaRecorder.onstop = () => {
+      clearInterval(animateFrequenciesInterval)
+      setTooltipOpen(false)
+      if (tooltipCycler) {
+        clearInterval(tooltipCycler)
+      }
     }
-  }, [tooltipMessages])
+
+    mediaRecorder.ondataavailable = async (event) => {
+      if (event.data.size > 0) {
+        animateStop?.fire()
+        const reader = new FileReader()
+
+        reader.onloadend = async function () {
+          if (reader.result) {
+            const base64Audio = (reader.result as string).split(",")[1] // Splitting to get only the Base64 data
+
+            const body: ExtractRequest = {
+              jsonSchema: Buffer.from(JSON.stringify(props.schema)).toString("base64"),
+              document: base64Audio,
+            }
+
+            await apiRequest(body)
+
+            animateUploaded?.fire()
+            setTooltipOpen(true)
+            setTooltipText(initialToolTipMessages[0])
+            setTooltipMessages(initialToolTipMessages)
+          }
+        }
+
+        reader.readAsDataURL(event.data)
+      }
+    }
+  }
+
+  const startRecording = (mediaRecorder: MediaRecorder) => {
+    mediaRecorder.start()
+    setMediaRecorder(mediaRecorder)
+    setRecording(true)
+    animateStart?.fire()
+    if (tooltipCycler) {
+      clearInterval(tooltipCycler)
+    }
+    // We show this tooltip only when the user clicks the button
+    setTooltipText("Start speaking to fill out this form")
+    // After that we cycle through the following messages
+    setTooltipMessages([
+      "You can talk like you normally would with a friend or colleague",
+      "It helps to spell out names like you would in a phone call",
+      "You can say things like 'my name is Peter, that's P-E-T-E-R'",
+      "Click the FormButtler icon again to stop recording",
+    ])
+  }
+
+  const stopRecording = (mediaRecorder: MediaRecorder) => {
+    // Stop all tracks to ensure that the microphone is released
+    mediaRecorder.stop()
+    mediaRecorder.stream.getTracks().forEach((track) => track.stop())
+    setRecording(false)
+  }
 
   const handleRecording = () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -178,14 +175,9 @@ export default function MagicForm() {
     analyser.smoothingTimeConstant = 0.1
 
     if (recording && mediaRecorder) {
-      mediaRecorder.stop()
-
-      // Stop all tracks to ensure that the microphone is released
-      mediaRecorder.stream.getTracks().forEach((track) => track.stop())
-
-      setRecording(false)
+      stopRecording(mediaRecorder)
     } else {
-      // Request permission and start recording only when the button is clicked
+      // Request permission and start recording once the the button is clicked
       setTooltipOpen(false)
       navigator.mediaDevices
         .getUserMedia({ audio: true })
@@ -196,106 +188,28 @@ export default function MagicForm() {
           const source = audioContext.createMediaStreamSource(stream)
           source.connect(analyser)
 
-          const dataArray = new Uint8Array(analyser.frequencyBinCount)
-
           // Check amplitude periodically
-          const animateFrequencies = setInterval(() => {
-            analyser.getByteFrequencyData(dataArray)
+          const animateFrequenciesInterval = animateFrequencies(analyser)
 
-            const maxRelevantIndex = 55
-            const segmentSize = Math.floor(maxRelevantIndex / 3)
+          addStopEvents(newMediaRecorder, animateFrequenciesInterval)
 
-            const segments = [
-              dataArray.slice(0, segmentSize),
-              dataArray.slice(segmentSize, 2 * segmentSize),
-              dataArray.slice(2 * segmentSize, maxRelevantIndex),
-            ]
-
-            const barValues = segments.map((segment) => {
-              // Get the max value for each segment
-              const max = Math.max(...Array.from(segment))
-              // Normalize the value to be between 0 and 100
-              return (max / 255) * 100
-            })
-
-            const center = barValues[0]
-            const left = barValues[1]
-            const right = barValues[2]
-
-            if (animateCenter) {
-              animateCenter.value = center
-            }
-            if (animateLeft) {
-              animateLeft.value = left
-            }
-            if (animateRight) {
-              animateRight.value = right
-            }
-          }, 50)
-
-          if (tooltipCycler) {
-            clearInterval(tooltipCycler)
-          }
-          setTooltipMessages([
-            "You can talk like you normally would with a friend or colleague",
-            "It helps to spell out names like you would in a phone call",
-            "You can say things like 'my name is Peter, that's P-E-T-E-R'",
-            "Click the FormButtler icon again to stop recording",
-          ])
-
-          // Stop checking when recording stops
-          newMediaRecorder.onstop = () => {
-            clearInterval(animateFrequencies)
-            setTooltipOpen(false)
-            if (tooltipCycler) {
-              clearInterval(tooltipCycler)
-            }
-          }
-
-          newMediaRecorder.ondataavailable = async (event) => {
-            if (event.data.size > 0) {
-              animateStop?.fire()
-              const reader = new FileReader()
-
-              reader.onloadend = async function () {
-                if (reader.result) {
-                  const base64Audio = (reader.result as string).split(",")[1] // Splitting to get only the Base64 data
-
-                  const body: ExtractRequest = {
-                    jsonSchema: Buffer.from(JSON.stringify(schema)).toString("base64"),
-                    document: base64Audio,
-                  }
-
-                  const resp = await fetch("/api/extract", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(body),
-                  })
-                  setFormData(await resp.json())
-
-                  animateUploaded?.fire()
-                  setTooltipOpen(true)
-                  setTooltipText(initialToolTipMessages[0])
-                  setTooltipMessages(initialToolTipMessages)
-                }
-              }
-
-              reader.readAsDataURL(event.data)
-            }
-          }
-          newMediaRecorder.start()
-          setMediaRecorder(newMediaRecorder)
-          setRecording(true)
-          animateStart?.fire()
-          setTooltipText("Start speaking to fill out this form")
+          startRecording(newMediaRecorder)
         })
         .catch(() => {
           Toast.error(["Permission to use microphone not given.", "Click 'Reset permission' in your browser settings."])
         })
     }
   }
+
+  useEffect(() => {
+    const intervalId = cycleTooltips(tooltipMessages)
+    setTooltipCycler(intervalId)
+
+    // Cleanup the interval on unmount
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [tooltipMessages])
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-y-2">
@@ -315,7 +229,7 @@ export default function MagicForm() {
       </div>
       <ThemedForm
         formData={formData}
-        schema={schema}
+        schema={props.schema}
         validator={validator}
         className="form-control w-full gap-y-2"
         onSubmit={(e) => console.log(e)}
