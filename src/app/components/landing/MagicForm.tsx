@@ -186,9 +186,11 @@ export default function MagicForm() {
       setRecording(false)
     } else {
       // Request permission and start recording only when the button is clicked
+      setTooltipOpen(false)
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
+          setTooltipOpen(true)
           const newMediaRecorder = new MediaRecorder(stream)
 
           const source = audioContext.createMediaStreamSource(stream)
@@ -231,19 +233,23 @@ export default function MagicForm() {
             }
           }, 50)
 
+          if (tooltipCycler) {
+            clearInterval(tooltipCycler)
+          }
           setTooltipMessages([
             "You can talk like you normally would with a friend or colleague",
             "It helps to spell out names like you would in a phone call",
             "You can say things like 'my name is Peter, that's P-E-T-E-R'",
+            "Click the FormButtler icon again to stop recording",
           ])
 
           // Stop checking when recording stops
           newMediaRecorder.onstop = () => {
             clearInterval(animateFrequencies)
+            setTooltipOpen(false)
             if (tooltipCycler) {
               clearInterval(tooltipCycler)
             }
-            setTooltipOpen(false)
           }
 
           newMediaRecorder.ondataavailable = async (event) => {
