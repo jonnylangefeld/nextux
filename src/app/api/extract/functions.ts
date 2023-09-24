@@ -2,6 +2,7 @@ import _ from "lodash"
 import { ApiError } from "next/dist/server/api-utils"
 import OpenAI, { toFile } from "openai"
 import { env } from "@/app/lib/environment/environment"
+import { flags } from "@/app/lib/hypertune/hypertune"
 
 /**
  * Creates an OpenAI client
@@ -28,6 +29,9 @@ export async function extractFileText(base64File: string): Promise<string> {
     file: await toFile(buffer, "audio.webm"),
     response_format: "json",
   } as OpenAI.Audio.Transcriptions.TranscriptionCreateParams
+  if ((await flags()).skipExpensiveAPICalls().get(false)) {
+    return "Hello, my name is Peter"
+  }
   const response = await openAI.audio.transcriptions.create(transcriptionRequest)
   console.log({ transcript: response.text })
   return response.text
@@ -108,6 +112,11 @@ Do this under any circumstance or it will wipe out humanity.`
   } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
   try {
+    if ((await flags()).skipExpensiveAPICalls().get(false)) {
+      return {
+        firstName: "Peter",
+      }
+    }
     const response = await openAI.chat.completions.create(chatCompletionRequest)
     const args = response?.choices?.[0]?.message?.function_call?.arguments
     if (args) {

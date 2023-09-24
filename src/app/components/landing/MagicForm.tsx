@@ -41,11 +41,6 @@ export default function MagicForm(props: Props) {
   const skipExpensiveAPICalls = useHypertune().skipExpensiveAPICalls().get(false)
 
   const apiRequest = async (body: ExtractRequest) => {
-    if (skipExpensiveAPICalls) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      Toast.info(["Dev mode: API call skipped"])
-      return
-    }
     const resp = await fetch("/api/extract", {
       method: "POST",
       headers: {
@@ -54,6 +49,9 @@ export default function MagicForm(props: Props) {
       body: JSON.stringify(body),
     })
     setFormData(await resp.json())
+    if (skipExpensiveAPICalls) {
+      Toast.info(["Dev mode: API call skipped"])
+    }
   }
 
   const animateFrequencies = (analyser: AnalyserNode) => {
