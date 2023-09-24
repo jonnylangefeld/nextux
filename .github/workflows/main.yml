@@ -7,6 +7,8 @@ jobs:
   lint-test:
     name: Lint & Test
     runs-on: ubuntu-22.04
+    env:
+      NEXT_PUBLIC_HYPERTUNE_TOKEN: ${{ secrets.NEXT_PUBLIC_HYPERTUNE_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
