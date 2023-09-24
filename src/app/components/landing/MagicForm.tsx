@@ -240,6 +240,7 @@ export default function MagicForm() {
             "You can talk like you normally would with a friend or colleague",
             "It helps to spell out names like you would in a phone call",
             "You can say things like 'my name is Peter, that's P-E-T-E-R'",
+            "Click the FormButtler icon again to stop recording",
           ])
 
           // Stop checking when recording stops
