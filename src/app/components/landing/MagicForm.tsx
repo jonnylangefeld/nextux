@@ -6,6 +6,7 @@ import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import { useEffect, useState } from "react"
 import * as Toast from "@/app/components/Toast"
+import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
 
@@ -37,9 +38,10 @@ export default function MagicForm(props: Props) {
   const animateCenter = useStateMachineInput(rive, "recording", "center")
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
+  const skipExpensiveAPICalls = useHypertune().skipExpensiveAPICalls().get(false)
 
   const apiRequest = async (body: ExtractRequest) => {
-    if (process.env.NEXT_PUBLIC_SKIP_API_CALLS === "true") {
+    if (skipExpensiveAPICalls) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       Toast.info(["Dev mode: API call skipped"])
       return
