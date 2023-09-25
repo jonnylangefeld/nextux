@@ -2,9 +2,9 @@ import NodeHttpAdapter from "@pollyjs/adapter-node-http"
 import FSPersister from "@pollyjs/persister-fs"
 import { setupPolly } from "setup-polly-jest"
 import path from "path"
+import { FileType } from "@/app/lib/types"
 import { bad, complex, complexLong, contact, creditCard, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
-import { FileType } from "@/app/lib/types"
 
 const context = setupPolly({
   adapters: [NodeHttpAdapter],
