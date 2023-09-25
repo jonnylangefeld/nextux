@@ -37,7 +37,9 @@ export async function POST(request: NextRequest): Promise<Response> {
 
     const { document, jsonSchema } = ExtractRequest.fromJSON(validationResult)
 
-    if (!Object.values(FileType).some((type) => isBase64FileType(document, type))) {
+    const fileType = Object.values(FileType).find((type) => isBase64FileType(document, type))
+
+    if (!fileType) {
       return apiError(errors.InvalidDocument, 400)
     }
 
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       return apiError(errors.InvalidJSONSchema, 400, String(error))
     }
 
-    const text = await extractFileText(document)
+    const text = await extractFileText(document, fileType)
     const result = await extractStructuredData(text, jsonSchemaObj)
 
     return NextResponse.json(result)

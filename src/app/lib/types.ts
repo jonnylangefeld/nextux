@@ -2,4 +2,5 @@
 export enum FileType {
   MP3 = "mp3",
   WEBM = "webm",
+  MP4 = "mp4",
 }

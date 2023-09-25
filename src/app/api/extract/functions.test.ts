@@ -4,6 +4,7 @@ import { setupPolly } from "setup-polly-jest"
 import path from "path"
 import { bad, complex, complexLong, contact, creditCard, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
+import { FileType } from "@/app/lib/types"
 
 const context = setupPolly({
   adapters: [NodeHttpAdapter],
@@ -54,38 +55,38 @@ describe("extractFileText", () => {
   })
 
   it("should extract a simple mp3 file", async () => {
-    const got = await extractFileText(simple.fileBase64)
+    const got = await extractFileText(simple.fileBase64, FileType.MP3)
 
     expect(got).toEqual(simple.transcript)
   })
 
   it("should extract a complex mp3 file", async () => {
-    const got = await extractFileText(complex.fileBase64)
+    const got = await extractFileText(complex.fileBase64, FileType.MP3)
 
     expect(got).toEqual(complex.transcript)
   })
 
   it("should extract a longer complex mp3 file", async () => {
-    const got = await extractFileText(complexLong.fileBase64)
+    const got = await extractFileText(complexLong.fileBase64, FileType.MP3)
 
     expect(got).toEqual(complexLong.transcript)
   })
 
   it("should extract a contact mp3 file", async () => {
-    const got = await extractFileText(contact.fileBase64)
+    const got = await extractFileText(contact.fileBase64, FileType.MP3)
 
     expect(got).toEqual(contact.transcript)
   })
 
   it("should extract a creditCard mp3 file", async () => {
-    const got = await extractFileText(creditCard.fileBase64)
+    const got = await extractFileText(creditCard.fileBase64, FileType.MP3)
 
     expect(got).toEqual(creditCard.transcript)
   })
 
   it("should extract a bad mp3 file", async () => {
     // This example was spoken without a headset. Just the microphone of the computer.
-    const got = await extractFileText(bad.fileBase64)
+    const got = await extractFileText(bad.fileBase64, FileType.MP3)
 
     expect(got).toEqual(bad.transcript)
   })

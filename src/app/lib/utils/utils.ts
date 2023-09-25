@@ -4,6 +4,7 @@ import { FileType } from "../types"
 const magicNumbers: Record<FileType, string> = {
   [FileType.MP3]: "fff3e4",
   [FileType.WEBM]: "1a45df",
+  [FileType.MP4]: "0000001c6674",
 }
 
 /**

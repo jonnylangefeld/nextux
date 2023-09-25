@@ -3,6 +3,7 @@ import { ApiError } from "next/dist/server/api-utils"
 import OpenAI, { toFile } from "openai"
 import { env } from "@/app/lib/environment/environment"
 import { flags } from "@/app/lib/hypertune/hypertune"
+import { FileType } from "@/app/lib/types"
 
 /**
  * Creates an OpenAI client
@@ -18,15 +19,16 @@ const openAI = openAIClient()
 /**
  * Extracts text from a file using the Google Cloud Speech API
  * @param base64File The base64 file to extract text from
+ * @param fileType The file type of the file
  * @returns The string with the extracted data
  * @throws ApiError if the file couldn't be extracted
  * @see https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize
  */
-export async function extractFileText(base64File: string): Promise<string> {
+export async function extractFileText(base64File: string, fileType: FileType): Promise<string> {
   const buffer = Buffer.from(base64File, "base64")
   const transcriptionRequest = {
     model: "whisper-1",
-    file: await toFile(buffer, "audio.webm"),
+    file: await toFile(buffer, `audio.${fileType}`),
     response_format: "json",
   } as OpenAI.Audio.Transcriptions.TranscriptionCreateParams
   if ((await flags()).skipExpensiveAPICalls().get(false)) {

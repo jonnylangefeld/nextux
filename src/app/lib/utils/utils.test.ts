@@ -11,6 +11,13 @@ describe("isBase64FileType", () => {
     expect(result).toBe(true)
   })
 
+  it("should correctly identify a valid base64 MP4", async () => {
+    const mp4Buffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/contact.mp4"))
+    const base64Mp4 = mp4Buffer.toString("base64")
+    const result = isBase64FileType(base64Mp4, FileType.MP4)
+    expect(result).toBe(true)
+  })
+
   it("should correctly identify a valid base64 WEBM", async () => {
     const webmBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/contact.webm"))
     const base64Webm = webmBuffer.toString("base64")
