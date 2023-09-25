@@ -21,6 +21,7 @@ export const context: Rec2 = {
 
 /**
  * The Hypertune flags. Use this only on the server.
+ * @returns The Hypertune flags
  */
 export const flags = async () => {
   if (process.env.NODE_ENV !== "test") {
