@@ -3,7 +3,7 @@ import FSPersister from "@pollyjs/persister-fs"
 import { setupPolly } from "setup-polly-jest"
 import path from "path"
 import { FileType } from "@/app/lib/types"
-import { bad, complex, complexLong, contact, creditCard, simple } from "./data.test"
+import { bad, complex, complexLong, contact, creditCard, mp4, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
 
 const context = setupPolly({
@@ -76,6 +76,12 @@ describe("extractFileText", () => {
     const got = await extractFileText(contact.fileBase64, FileType.MP3)
 
     expect(got).toEqual(contact.transcript)
+  })
+
+  it("should extract a contact mp4 file", async () => {
+    const got = await extractFileText(mp4.fileBase64, FileType.MP4)
+
+    expect(got).toEqual(mp4.transcript)
   })
 
   it("should extract a creditCard mp3 file", async () => {

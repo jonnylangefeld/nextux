@@ -195,6 +195,13 @@ export const creditCard: useCase = {
     "My credit card number is 1-2-3-4-5-6-7-8-8-6-7-5-4-3-2-1 and my name is Johnny Langefeld that's spelled J-O-N-N-Y and then L-A-N-G-E-F-E-L-D and the expiration date is October 2024 and the CVV code is 4-3-1.",
 }
 
+const mp4FileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/contact.mp4"))
+export const mp4: useCase = {
+  fileBase64: mp4FileBuffer.toString("base64"),
+  jsonSchema: {},
+  transcript: "It's Johnny.", // This is wrong and has to be updated once we get the right model working
+}
+
 const badFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/bad.mp3"))
 export const bad: useCase = {
   fileBase64: badFileBuffer.toString("base64"),
