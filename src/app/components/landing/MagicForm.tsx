@@ -67,7 +67,6 @@ export default function MagicForm(props: Props) {
       body: JSON.stringify(body),
     })
     const json = await resp.json()
-    Toast.info([JSON.stringify(json)])
     setFormData(json)
     if (skipExpensiveAPICalls) {
       Toast.info(["Dev mode: API call skipped"])

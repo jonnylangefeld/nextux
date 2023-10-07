@@ -17,10 +17,10 @@ export default function Hero() {
       setItems("fixed items-center")
       setTranslate("")
     }
-    if (screenBottom - 160 < threshold) {
-      // 160 is 10rem
+    if (screenBottom - 176 < threshold) {
+      // this has to match the margin of the Demo.tsx section
       setItems("absolute items-end")
-      setTranslate("translate-y-[-10rem]")
+      setTranslate("translate-y-[-11rem]")
     }
   }
 
@@ -37,7 +37,7 @@ export default function Hero() {
   return (
     <Section>
       <div className="h-screen" ref={screenRef} />
-      <div className={`flex h-screen ${items}`}>
+      <div className={`flex h-screen w-fit ${items}`}>
         <div className={`max-w-lg ${translate} text-center`} ref={contentRef}>
           <div className="xs:text-5xl text-4xl font-bold tracking-tight sm:text-6xl">
             Make <Highlight>human</Highlight> input more <Highlight>natural</Highlight>

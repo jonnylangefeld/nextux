@@ -7,7 +7,7 @@ import Section from "./Section"
 export default function Demo() {
   const MagicForm = dynamic(() => import("./MagicForm"), { ssr: false })
   return (
-    <Section className="z-10 -mt-40" id="demo">
+    <Section className="z-10 -mt-44" id="demo">
       <Frame>
         <MagicForm schema={contactFormSchema} />
       </Frame>
