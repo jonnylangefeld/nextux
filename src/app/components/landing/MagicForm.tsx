@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import * as Toast from "@/app/components/Toast"
 import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
+import Highlight from "./Highlight"
 import daisyUI from "../themes/rjsf/daisyUI"
 
 const webmSupported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
@@ -28,7 +29,7 @@ if (!webmSupported) {
     })
 }
 
-const initialToolTipMessages = ["Click the FormButtler icon to help you fill out this form", "Try it out!"]
+const initialToolTipMessages = ["Click the FormButler icon to help you fill out this form", "Try it out!"]
 const tooltipDuration = 5000
 
 const ThemedForm = withTheme(daisyUI)
@@ -46,7 +47,7 @@ export default function MagicForm(props: Props) {
   const [tooltipCycler, setTooltipCycler] = useState<NodeJS.Timer | null>(null)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const { rive, RiveComponent } = useRive({
-    src: "/formbuttler.riv",
+    src: "/formbutler.riv",
     stateMachines: "recording",
     autoplay: true,
   })
@@ -172,7 +173,7 @@ export default function MagicForm(props: Props) {
       "You can talk like you normally would with a friend or colleague",
       "It helps to spell out names like you would in a phone call",
       "You can say things like 'my name is Peter, that's P-E-T-E-R'",
-      "Click the FormButtler icon again to stop recording",
+      "Click the FormButler icon again to stop recording",
     ])
   }
 
@@ -233,12 +234,17 @@ export default function MagicForm(props: Props) {
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-y-2">
-      <div className="flex flex-row items-start justify-between">
-        <div className="flex-nowrap font-semibold md:text-2xl">Fill out this form</div>
+      <div className="flex flex-row items-start justify-between gap-x-3 sm:gap-x-16 lg:gap-x-32">
+        <div className="flex flex-col gap-y-2">
+          <div className="font-semibold md:text-2xl">
+            Fill out this demo form with your <Highlight>voice</Highlight> using the FormButler icon!
+          </div>
+          <div>The data in this form won&apos;t get collected.</div>
+        </div>
         <div
           className={`${
             tooltipOpen ? "tooltip-open" : ""
-          } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip tooltip-left xl:tooltip-top before:max-w-[10rem] before:content-[attr(data-tip)] md:before:max-w-[20rem]`}
+          } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip tooltip-bottom md:tooltip-top before:max-w-[10rem] before:translate-x-[-90%] before:content-[attr(data-tip)] md:before:max-w-[20rem] lg:before:translate-x-[-50%]`}
           data-tip={tooltipText}
         >
           <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
