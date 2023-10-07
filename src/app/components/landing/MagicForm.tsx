@@ -10,9 +10,9 @@ import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
 
-const supportsWebm = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+const webmSupported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
 
-if (!supportsWebm) {
+if (!webmSupported) {
   // Dynamically import the polyfill if 'audio/webm' is not supported
   Promise.all([import("audio-recorder-polyfill"), import("audio-recorder-polyfill/mpeg-encoder")])
     .then(([AudioRecorderModule, mpegEncoderModule]) => {
