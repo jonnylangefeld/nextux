@@ -10,6 +10,24 @@ import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
 import daisyUI from "../themes/rjsf/daisyUI"
 
+const webmSupported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+
+if (!webmSupported) {
+  // Dynamically import the polyfill if 'audio/webm' is not supported
+  Promise.all([import("audio-recorder-polyfill"), import("audio-recorder-polyfill/mpeg-encoder")])
+    .then(([AudioRecorderModule, mpegEncoderModule]) => {
+      const AudioRecorder = AudioRecorderModule.default
+      const mpegEncoder = mpegEncoderModule.default
+
+      AudioRecorder.encoder = mpegEncoder
+      AudioRecorder.prototype.mimeType = "audio/mpeg"
+      window.MediaRecorder = AudioRecorder
+    })
+    .catch((error) => {
+      console.error("Error importing polyfill:", error)
+    })
+}
+
 const initialToolTipMessages = ["Click the FormButtler icon to help you fill out this form", "Try it out!"]
 const tooltipDuration = 5000
 
@@ -48,7 +66,8 @@ export default function MagicForm(props: Props) {
       },
       body: JSON.stringify(body),
     })
-    setFormData(await resp.json())
+    const json = await resp.json()
+    setFormData(json)
     if (skipExpensiveAPICalls) {
       Toast.info(["Dev mode: API call skipped"])
     }
@@ -101,16 +120,17 @@ export default function MagicForm(props: Props) {
   }
 
   const addStopEvents = (mediaRecorder: MediaRecorder, animateFrequenciesInterval: NodeJS.Timer) => {
-    mediaRecorder.onstop = () => {
+    mediaRecorder.addEventListener("stop", () => {
       clearInterval(animateFrequenciesInterval)
       setTooltipOpen(false)
       if (tooltipCycler) {
         clearInterval(tooltipCycler)
       }
-    }
+    })
 
-    mediaRecorder.ondataavailable = async (event) => {
+    mediaRecorder.addEventListener("dataavailable", (event) => {
       if (event.data.size > 0) {
+        console.log(event.data)
         animateStop?.fire()
         const reader = new FileReader()
 
@@ -134,7 +154,7 @@ export default function MagicForm(props: Props) {
 
         reader.readAsDataURL(event.data)
       }
-    }
+    })
   }
 
   const startRecording = (mediaRecorder: MediaRecorder) => {
