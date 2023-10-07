@@ -1,5 +1,5 @@
 import React from "react"
-import Button from "@/app/components/Button"
+import SignUpButton from "./SignUpButton"
 import Logo from "../Logo"
 
 export default function Header() {
@@ -10,7 +10,7 @@ export default function Header() {
           <Logo className="h-10 w-44 md:w-56 lg:w-64" />
         </div>
         <div className="xs:space-x-2 flex flex-1 items-center justify-end space-x-4">
-          <Button gradient>Sign Up</Button>
+          <SignUpButton />
         </div>
       </nav>
     </header>

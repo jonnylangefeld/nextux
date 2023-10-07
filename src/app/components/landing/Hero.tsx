@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import Button from "@/app/components/Button"
 import { CaretDoubleDown } from "@/app/components/Icons"
+import * as Toast from "@/app/components/Toast"
 import Highlight from "./Highlight"
 import Section from "./Section"
 
@@ -52,7 +53,13 @@ export default function Hero() {
             Make <Highlight>human</Highlight> input more <Highlight>natural</Highlight>
           </div>
           {/* <a href="/" target="_blank"> */}
-          <Button gradient className="btn">
+          <Button
+            gradient
+            className="btn"
+            onClick={() => {
+              Toast.warning(["coming soon! ⏳"])
+            }}
+          >
             Join the waitlist! 🚀
           </Button>
           {/* </a> */}
