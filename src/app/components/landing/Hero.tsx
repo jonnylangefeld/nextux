@@ -53,7 +53,7 @@ export default function Hero() {
           </div>
           {/* <a href="/" target="_blank"> */}
           <Button gradient className="btn">
-            Get Started 🚀
+            Join the waitlist! 🚀
           </Button>
           {/* </a> */}
           <a href="#demo" onClick={handleDemoClick}>
