@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react"
 import Button from "@/app/components/Button"
+import { CaretDoubleDown } from "@/app/components/Icons"
 import Highlight from "./Highlight"
 import Section from "./Section"
 
@@ -34,21 +35,33 @@ export default function Hero() {
     }
   }, [])
 
+  const handleDemoClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.scrollTo({ behavior: "smooth", top: window.innerHeight - 200 })
+  }
+
   return (
     <Section>
       <div className="h-screen" ref={screenRef} />
       <div className={`flex h-screen w-fit ${items}`}>
-        <div className={`max-w-lg ${translate} text-center`} ref={contentRef}>
+        <div
+          className={`flex max-w-lg flex-col ${translate} items-center justify-center gap-y-10 text-center`}
+          ref={contentRef}
+        >
           <div className="xs:text-5xl text-4xl font-bold tracking-tight sm:text-6xl">
             Make <Highlight>human</Highlight> input more <Highlight>natural</Highlight>
           </div>
-          <div className="mt-10 flex items-center justify-center gap-x-6">
-            {/* <a href="/" target="_blank"> */}
-            <Button gradient className="btn">
-              Get Started 🚀
-            </Button>
-            {/* </a> */}
-          </div>
+          {/* <a href="/" target="_blank"> */}
+          <Button gradient className="btn">
+            Get Started 🚀
+          </Button>
+          {/* </a> */}
+          <a href="#demo" onClick={handleDemoClick}>
+            <div className="flex cursor-pointer flex-nowrap items-center gap-x-2 rounded-full bg-gradient-to-br from-slate-800 to-slate-600 p-3 px-4 py-2 text-slate-200 shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)] dark:from-slate-950 dark:to-slate-800">
+              <p>Try the demo</p>
+              <CaretDoubleDown className="animate-bounce align-baseline" size={16} weight="bold" />
+            </div>
+          </a>
         </div>
       </div>
     </Section>
