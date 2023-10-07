@@ -1,25 +1,37 @@
 "use client"
 
-import AudioRecorder from "audio-recorder-polyfill"
-import mpegEncoder from "audio-recorder-polyfill/mpeg-encoder"
 import React from "react"
 import Button from "../components/Button"
 import { ExtractRequest } from "../lib/proto/types"
 import { contactFormSchema } from "../lib/rjsfSchemas"
 
-AudioRecorder.encoder = mpegEncoder
-AudioRecorder.prototype.mimeType = "audio/mpeg"
-window.MediaRecorder = AudioRecorder
+const supportsWebm = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+
+if (!supportsWebm) {
+  // Dynamically import the polyfill if 'audio/webm' is not supported
+  Promise.all([import("audio-recorder-polyfill"), import("audio-recorder-polyfill/mpeg-encoder")])
+    .then(([AudioRecorderModule, mpegEncoderModule]) => {
+      const AudioRecorder = AudioRecorderModule.default
+      const mpegEncoder = mpegEncoderModule.default
+
+      AudioRecorder.encoder = mpegEncoder
+      AudioRecorder.prototype.mimeType = "audio/mpeg"
+      window.MediaRecorder = AudioRecorder
+    })
+    .catch((error) => {
+      console.error("Error importing polyfill:", error)
+    })
+}
 
 export default function RecordButton() {
   const [recording, setRecording] = React.useState(false)
   const [recorder, setRecorder] = React.useState<MediaRecorder | null>(null)
 
   const onClick = async () => {
-    if (recording) {
+    if (recording && recorder) {
+      recorder.stop()
+      recorder.stream.getTracks().forEach((track) => track.stop())
       setRecording(false)
-      recorder?.stop()
-      recorder?.stream.getTracks().forEach((i) => i.stop())
     }
     navigator.mediaDevices
       .getUserMedia({ audio: true })
