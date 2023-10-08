@@ -6,7 +6,7 @@ const hypertune = initializeHypertune(
     token: process.env.NEXT_PUBLIC_HYPERTUNE_TOKEN,
     loggingMode: "off",
     shouldInitializeFromServer: process.env.NODE_ENV !== "test",
-    shouldStartIntervals: process.env.NODE_ENV !== "test",
+    shouldStartIntervals: false,
     shouldListenForUpdates: true,
   }
 )
