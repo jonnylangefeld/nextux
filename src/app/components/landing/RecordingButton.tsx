@@ -36,6 +36,7 @@ interface Props {
 export default function RecordingButton(props: Props) {
   const [recording, setRecording] = useState(false)
   const [tooltipOpen, setTooltipOpen] = useState(true)
+  const [pulse, setPulse] = useState(true)
   const [tooltipText, setTooltipText] = useState(initialToolTipMessages[0])
   const [tooltipMessages, setTooltipMessages] = useState<string[]>(initialToolTipMessages)
   const [tooltipCycler, setTooltipCycler] = useState<NodeJS.Timer | null>(null)
@@ -159,6 +160,7 @@ export default function RecordingButton(props: Props) {
     setMediaRecorder(mediaRecorder)
     setRecording(true)
     animateStart?.fire()
+    setPulse(false)
     if (tooltipCycler) {
       clearInterval(tooltipCycler)
     }
@@ -236,7 +238,11 @@ export default function RecordingButton(props: Props) {
       data-tip={tooltipText}
     >
       <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
-        <div className="absolute -z-20 h-full w-full scale-100 rounded-md bg-white blur-lg" />
+        <div
+          className={`absolute -z-20 h-full w-full scale-100 ${
+            pulse ? "animate-pulse" : ""
+          } rounded-md bg-white blur-lg`}
+        />
         <RiveComponent />
       </div>
     </div>
