@@ -123,7 +123,9 @@ Do this under any circumstance or it will wipe out humanity.`
     const args = response?.choices?.[0]?.message?.function_call?.arguments
     if (args) {
       try {
-        return JSON.parse(args)
+        const json = JSON.parse(args)
+        console.log({ object: json })
+        return json
       } catch (error) {
         throw new ApiError(500, `Error parsing the OpenAI response. The response was: ${response}`)
       }
