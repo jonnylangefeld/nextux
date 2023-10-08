@@ -1,4 +1,5 @@
 import "./globals.css"
+import { Analytics } from "@vercel/analytics/react"
 import { Inter } from "next/font/google"
 import { Toaster } from "react-hot-toast"
 
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} text-gray-900 dark:text-gray-200`}>
         <Toaster position="bottom-right" />
+        <Analytics />
         {children}
       </body>
     </html>
