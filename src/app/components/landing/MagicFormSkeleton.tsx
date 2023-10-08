@@ -1,7 +1,3 @@
-import validator from "@rjsf/validator-ajv8"
-import Highlight from "./Highlight"
-import RecordingButton from "./RecordingButton"
-
 export default function MagicFormSkeleton() {
   return (
     <div className="flex w-full max-w-xl animate-pulse flex-col gap-y-2">
