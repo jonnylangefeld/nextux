@@ -15,8 +15,7 @@ export default function Logo({ className }: Props) {
         className="absolute inset-0 h-full w-full"
         role="img"
         style={{
-          backgroundColor: "transparent",
-          colorScheme: "light",
+          colorScheme: "normal",
         }}
       ></object>
       <Link href="/" className="absolute inset-0" />
