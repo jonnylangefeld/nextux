@@ -5,6 +5,7 @@ interface useCase {
   fileBase64: string
   jsonSchema: { [key: string]: unknown }
   transcript: string
+  lastResponse?: string
 }
 
 const simpleFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/simple.mp3"))
@@ -144,6 +145,7 @@ export const contact: useCase = {
   },
   transcript:
     "My first name is Johnny, spelled J-O-N-N-Y, and my last name is Langefeld, L-A-N-G-E-F-E-L-D. And I live in 1 Ferry Building in San Francisco, California, 94105. My email address is johnnylangefeld at gmail.com. That's J-O-N-N-Y, L-A-N-G-E-F-E-L-D at gmail.com. And I'm born on July 22, 1991.",
+  lastResponse: `{"firstName":"Jonny","lastName":"Langefeld","address":{"street":"1 Ferry Building","city":"San Francisco","stateAbbreviation":"CA","zipCode":"94105"},"emailAddress":"jonnylangefeld@gmail.com","birthDate":"1991-07-22"}`,
 }
 
 const creditCardFileBuffer = fs.readFileSync(path.resolve(__dirname, "../../__testdata__/credit-card.mp3"))

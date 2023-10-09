@@ -10,4 +10,6 @@ message ExtractRequest {
   //
   // @minLength 1
   string jsonSchema = 2;
+  // lastResponse contains the stringified version of an openAPI schema of a previous response. The openAI call will take it into consideration and merge it with the new data
+  optional string lastResponse = 3;
 }

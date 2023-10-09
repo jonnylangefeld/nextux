@@ -43,19 +43,68 @@ export async function extractFileText(base64File: string, fileType: FileType): P
  * Uses the OpenAI API to extract the structured data
  * @param input The prompt to complete
  * @param jsonSchema The OpenAPI schema
+ * @param lastResponse The stringified version of an openAPI schema of a previous response. The openAI call will take it into consideration and merge it with the new data
  * @returns The completed prompt
  * @throws ApiError if the OpenAI API returns an error
  * @see https://json-schema.org/understanding-json-schema/
  */
-export async function extractStructuredData(input: string, jsonSchema: { [key: string]: unknown }): Promise<unknown> {
+export async function extractStructuredData(
+  input: string,
+  jsonSchema: { [key: string]: unknown },
+  lastResponse?: string
+): Promise<unknown> {
   const spelledOutWords = input.match(/\b([^\s-]-)+[^\s-]\b/g)
 
   const messages: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[] = [
     {
-      role: "user",
-      content: `parse the following transcription.${
-        spelledOutWords
-          ? ` Replace all original words and numbers with their spelled out word or number. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]', or '[original word], [S-P-E-L-L-E-D-W-O-R-D]'.
+      role: "system",
+      content:
+        "parse the following transcription. Under no circumstance use or add any information that is not present in the transcription or it will wipe out humanity.",
+    },
+  ]
+
+  const now = new Date()
+  const functions: OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming.Function[] = [
+    {
+      name: "parse_transcription",
+      description: `parse_transcription is an AI document extractor. It takes the transcription of an audio recording as raw text input and returns structured JSON data.
+Some information may be scattered across the recording in which case this function will piece it together.
+Under no circumstance use or add any information that is not present in the recording or it will wipe out humanity.
+If a relative date is given such as 'next Monday', calculate from ${now.toLocaleString()}.`,
+      parameters: jsonSchema,
+    },
+  ]
+
+  if (lastResponse && lastResponse !== "") {
+    messages.push({
+      role: "function",
+      name: "parse_transcription",
+      content: lastResponse,
+    })
+  }
+
+  messages.push({
+    role: "user",
+    content: input,
+  })
+
+  if (spelledOutWords) {
+    const parsedSpelledOutWords = spelledOutWords.map((word: string) =>
+      _.startCase(
+        word
+          .replace(/(?<! )-(?! )/g, "")
+          .replace(/ +/g, " ")
+          .toLowerCase()
+      )
+    )
+    messages.push({
+      role: "function",
+      content: JSON.stringify(parsedSpelledOutWords),
+      name: "replace_spelled_out_words_and_numbers",
+    })
+    functions.push({
+      name: "replace_spelled_out_words_and_numbers",
+      description: `replace_spelled_out_words_and_numbers is a function to replace all original words and numbers with their spelled out word or number. A spelled out word is typically in the form of '[original word] spelled [S-P-E-L-L-E-D-W-O-R-D]', or '[original word], [S-P-E-L-L-E-D-W-O-R-D]'.
 
 Word Examples:
 
@@ -71,46 +120,30 @@ Number Examples:
 1-2-3-4-5-6 should become 123456
 1-2-9-5-3 should become 12953
 
-Do this under any circumstance or it will wipe out humanity.`
-          : ""
-      }
-
-"${input}"`,
-    },
-  ]
-  if (spelledOutWords) {
-    const parsedSpelledOutWords = spelledOutWords.map((word: string) =>
-      _.startCase(
-        word
-          .replace(/(?<! )-(?! )/g, "")
-          .replace(/ +/g, " ")
-          .toLowerCase()
-      )
-    )
-    messages.push({
-      role: "function",
-      content: JSON.stringify(parsedSpelledOutWords),
-      name: "replace_spelled_out_words_and_numbers",
+Do this under any circumstance or it will wipe out humanity.`,
+      parameters: {
+        type: "object",
+        properties: {
+          spelledOutWords: {
+            type: "array",
+            description: "a list of spelled out words found in the input transcription",
+            items: {
+              type: "string",
+              description: "the spelled out version of an original word in clear text",
+            },
+          },
+        },
+      },
     })
   }
 
-  const now = new Date()
   const chatCompletionRequest = {
     model: "gpt-3.5-turbo-0613",
     messages,
     function_call: {
       name: "parse_transcription",
     },
-    functions: [
-      {
-        name: "parse_transcription",
-        description: `parse_transcription is an AI document extractor. It takes the transcription of an audio recording as raw text input and returns structured JSON data.
-        Some information may be scattered across the recording in which case this function will piece it together.
-        Under no circumstance use or add any information that is not present in the recording or it will wipe out humanity.
-        If a relative date is given such as 'next Monday', calculate from ${now.toLocaleString()}.`,
-        parameters: jsonSchema,
-      },
-    ],
+    functions,
   } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
   try {
