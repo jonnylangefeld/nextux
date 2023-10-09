@@ -26,7 +26,7 @@ export default function MagicForm(props: Props) {
           </div>
           <div>The data in this form won&apos;t get collected.</div>
         </div>
-        <RecordingButton setFormData={setFormData} schema={props.schema} />
+        <RecordingButton setFormData={setFormData} formData={formData} schema={props.schema} />
       </div>
       <ThemedForm
         formData={formData}

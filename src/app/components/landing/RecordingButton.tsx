@@ -30,6 +30,7 @@ const tooltipDuration = 5000
 
 interface Props {
   setFormData: Dispatch<SetStateAction<object>>
+  formData: object
   schema: RJSFSchema
 }
 
@@ -139,13 +140,21 @@ export default function RecordingButton(props: Props) {
               jsonSchema: Buffer.from(JSON.stringify(props.schema)).toString("base64"),
               document: base64Audio,
             }
+            if (Object.keys(props.formData).length > 0) {
+              body.lastResponse = JSON.stringify(props.formData)
+            }
 
             await apiRequest(body)
 
             animateUploaded?.fire()
             setTooltipOpen(true)
-            setTooltipText(initialToolTipMessages[0])
-            setTooltipMessages(initialToolTipMessages)
+            const newMessages = [
+              "You can click again for a new recording to correct yourself or the butler",
+              "You only need to give it the new information",
+              ...initialToolTipMessages,
+            ]
+            setTooltipText(newMessages[0])
+            setTooltipMessages(newMessages)
           }
         }
 

@@ -17,10 +17,12 @@ export interface ExtractRequest {
    * @minLength 1
    */
   jsonSchema: string;
+  /** lastResponse contains the stringified version of an openAPI schema of a previous response. The openAI call will take it into consideration and merge it with the new data */
+  lastResponse?: string | undefined;
 }
 
 function createBaseExtractRequest(): ExtractRequest {
-  return { document: "", jsonSchema: "" };
+  return { document: "", jsonSchema: "", lastResponse: undefined };
 }
 
 export const ExtractRequest = {
@@ -30,6 +32,9 @@ export const ExtractRequest = {
     }
     if (message.jsonSchema !== "") {
       writer.uint32(18).string(message.jsonSchema);
+    }
+    if (message.lastResponse !== undefined) {
+      writer.uint32(26).string(message.lastResponse);
     }
     return writer;
   },
@@ -55,6 +60,13 @@ export const ExtractRequest = {
 
           message.jsonSchema = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.lastResponse = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -68,6 +80,7 @@ export const ExtractRequest = {
     return {
       document: isSet(object.document) ? String(object.document) : "",
       jsonSchema: isSet(object.jsonSchema) ? String(object.jsonSchema) : "",
+      lastResponse: isSet(object.lastResponse) ? String(object.lastResponse) : undefined,
     };
   },
 
@@ -79,6 +92,9 @@ export const ExtractRequest = {
     if (message.jsonSchema !== "") {
       obj.jsonSchema = message.jsonSchema;
     }
+    if (message.lastResponse !== undefined) {
+      obj.lastResponse = message.lastResponse;
+    }
     return obj;
   },
 
@@ -89,6 +105,7 @@ export const ExtractRequest = {
     const message = createBaseExtractRequest();
     message.document = object.document ?? "";
     message.jsonSchema = object.jsonSchema ?? "";
+    message.lastResponse = object.lastResponse ?? undefined;
     return message;
   },
 };

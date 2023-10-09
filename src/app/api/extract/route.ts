@@ -35,7 +35,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       return apiError(errors.InvalidRequestBody, 400, error instanceof ZodError ? error : String(error))
     }
 
-    const { document, jsonSchema } = ExtractRequest.fromJSON(validationResult)
+    const { document, jsonSchema, lastResponse } = ExtractRequest.fromJSON(validationResult)
 
     const fileType = Object.values(FileType).find((type) => isBase64FileType(document, type))
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     }
 
     const text = await extractFileText(document, fileType)
-    const result = await extractStructuredData(text, jsonSchemaObj)
+    const result = await extractStructuredData(text, jsonSchemaObj, lastResponse)
 
     return NextResponse.json(result)
   } catch (error) {

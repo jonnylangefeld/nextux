@@ -4,4 +4,5 @@ import { z } from "zod"
 export const extractRequestSchema = z.object({
   document: z.string().min(1),
   jsonSchema: z.string().min(1),
+  lastResponse: z.union([z.string(), z.undefined()]).optional(),
 })

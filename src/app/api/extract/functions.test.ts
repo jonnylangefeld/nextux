@@ -151,6 +151,30 @@ describe("extractStructuredData", () => {
     )
   })
 
+  it("with follow up", async () => {
+    const got = await extractStructuredData(
+      "I live in 3180 18th St, San Francisco, CA 94110",
+      contact.jsonSchema,
+      contact.lastResponse
+    )
+
+    expect(got).toBeDefined()
+    expect(got).toEqual(
+      expect.objectContaining({
+        firstName: "Jonny",
+        lastName: "Langefeld",
+        address: {
+          street: "3180 18th St",
+          city: "San Francisco",
+          stateAbbreviation: "CA",
+          zipCode: "94110",
+        },
+        emailAddress: "jonnylangefeld@gmail.com",
+        birthDate: "1991-07-22",
+      })
+    )
+  })
+
   it("credit card example", async () => {
     const got = await extractStructuredData(creditCard.transcript, creditCard.jsonSchema)
 
