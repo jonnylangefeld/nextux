@@ -63,13 +63,20 @@ export default function RecordingButton(props: Props) {
       },
       body: JSON.stringify(body),
     })
-    const json = await resp.json()
-
-    props.setFormData(json)
     if (skipExpensiveAPICalls) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       Toast.info(["Dev mode: API call skipped"])
     }
+    const json = await resp.json()
+    if (resp.status >= 500) {
+      Toast.error([json.error])
+      return
+    }
+    if (resp.status >= 400) {
+      Toast.warning([json.error])
+      return
+    }
+    props.setFormData(json)
   }
 
   const animateFrequencies = (analyser: AnalyserNode) => {
@@ -210,7 +217,7 @@ export default function RecordingButton(props: Props) {
         .getUserMedia({ audio: true })
         .then((stream) => {
           setTooltipOpen(true)
-          const newMediaRecorder = new MediaRecorder(stream)
+          const newMediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" })
 
           const source = audioContext.createMediaStreamSource(stream)
           source.connect(analyser)
