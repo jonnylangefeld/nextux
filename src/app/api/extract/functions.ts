@@ -17,12 +17,12 @@ export function openAIClient() {
 const openAI = openAIClient()
 
 /**
- * Extracts text from a file using the Google Cloud Speech API
+ * Extracts text from a file using the openAI Whisper API
  * @param base64File The base64 file to extract text from
  * @param fileType The file type of the file
  * @returns The string with the extracted data
  * @throws ApiError if the file couldn't be extracted
- * @see https://cloud.google.com/speech-to-text/docs/reference/rest/v1/speech/recognize
+ * @see https://platform.openai.com/docs/guides/speech-to-text
  */
 export async function extractFileText(base64File: string, fileType: FileType): Promise<string> {
   const buffer = Buffer.from(base64File, "base64")
