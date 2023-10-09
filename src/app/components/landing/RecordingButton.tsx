@@ -136,7 +136,6 @@ export default function RecordingButton(props: Props) {
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
       if (event.data.size > 0) {
-        console.log(event.data)
         animateStop?.fire()
         const reader = new FileReader()
 
