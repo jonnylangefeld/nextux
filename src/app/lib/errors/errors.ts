@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
 export const errors = {
-  InvalidDocument: "document is not a valid base64 or not an accepted document type",
+  InvalidDocument: "received a document type that's not implemented yet.",
   InvalidJSONSchema:
     "the given json schema isn't valid. You can try out your schema with https://www.jsonschemavalidator.net/",
   InvalidRequestBody: "the request body is invalid",
