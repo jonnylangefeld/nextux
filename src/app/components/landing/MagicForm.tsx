@@ -39,9 +39,9 @@ export default function MagicForm(props: Props) {
         schema={props.schema}
         validator={validator}
         className="form-control w-full gap-y-2"
-        onSubmit={() => {
+        onSubmit={() =>
           formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
-        }}
+        }
         showErrorList={false}
       />
       <Confetti numberOfPieces={150} eventEmitter={formEventEmitter} />
