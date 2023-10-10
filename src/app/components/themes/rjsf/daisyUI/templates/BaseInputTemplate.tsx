@@ -6,5 +6,10 @@ export default function BaseInputTemplate(props: BaseInputTemplateProps) {
     templates: { BaseInputTemplate },
   } = getDefaultRegistry()
 
-  return <BaseInputTemplate className="input-bordered input w-full" {...props} />
+  return (
+    <BaseInputTemplate
+      className={`input-bordered ${props.rawErrors !== undefined ? "input-error" : ""} input w-full`}
+      {...props}
+    />
+  )
 }
