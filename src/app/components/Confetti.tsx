@@ -28,23 +28,21 @@ export default function Confetti(props: Props) {
   }, [props.eventEmitter, props.numberOfPieces])
 
   return (
-    <>
-      <ReactConfetti
-        numberOfPieces={numberOfPieces}
-        confettiSource={{ x: position.x, y: position.y, w: position.w, h: position.h }}
-        width={window.innerWidth}
-        height={window.innerHeight}
-        style={{ transform: `translateY(${position.scrollY}px)` }}
-        recycle={false}
-        wind={0.05}
-        gravity={0.18}
-        initialVelocityX={{ min: 0, max: 8 }}
-        initialVelocityY={20}
-        onConfettiComplete={(confetti) => {
-          setNumberOfPieces(0)
-          confetti?.reset()
-        }}
-      />
-    </>
+    <ReactConfetti
+      numberOfPieces={numberOfPieces}
+      confettiSource={{ x: position.x, y: position.y, w: position.w, h: position.h }}
+      width={window.innerWidth}
+      height={window.innerHeight}
+      style={{ transform: `translateY(${position.scrollY}px)` }}
+      recycle={false}
+      wind={0.05}
+      gravity={0.18}
+      initialVelocityX={{ min: 0, max: 8 }}
+      initialVelocityY={20}
+      onConfettiComplete={(confetti) => {
+        setNumberOfPieces(0)
+        confetti?.reset()
+      }}
+    />
   )
 }
