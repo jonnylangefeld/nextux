@@ -1,14 +1,17 @@
 "use client"
 
-import { withTheme } from "@rjsf/core"
+import Form, { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
-import { useState } from "react"
+import { useRef, useState } from "react"
+import { EventEmitter } from "events"
 import Highlight from "./Highlight"
 import RecordingButton from "./RecordingButton"
+import Confetti from "../Confetti"
 import daisyUI from "../themes/rjsf/daisyUI"
 
 const ThemedForm = withTheme(daisyUI)
+const formEventEmitter = new EventEmitter()
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   schema: RJSFSchema
@@ -16,6 +19,8 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 
 export default function MagicForm(props: Props) {
   const [formData, setFormData] = useState({})
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formRef: React.RefObject<Form<any, RJSFSchema, any>> = useRef(null)
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-y-2">
@@ -29,13 +34,17 @@ export default function MagicForm(props: Props) {
         <RecordingButton setFormData={setFormData} formData={formData} schema={props.schema} />
       </div>
       <ThemedForm
+        ref={formRef}
         formData={formData}
         schema={props.schema}
         validator={validator}
         className="form-control w-full gap-y-2"
-        onSubmit={(e) => console.log(e)}
+        onSubmit={() => {
+          formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
+        }}
         showErrorList={false}
-      ></ThemedForm>
+      />
+      <Confetti numberOfPieces={150} eventEmitter={formEventEmitter} />
     </div>
   )
 }
