@@ -34,6 +34,7 @@ export default function MagicForm(props: Props) {
         validator={validator}
         className="form-control w-full gap-y-2"
         onSubmit={(e) => console.log(e)}
+        showErrorList={false}
       ></ThemedForm>
     </div>
   )
