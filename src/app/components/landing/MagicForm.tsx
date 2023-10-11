@@ -69,7 +69,7 @@ export default function MagicForm(props: Props) {
           </div>
           <div>The data in this form won&apos;t get collected.</div>
         </div>
-        <div className="aspect-square w-[2.5rem]"></div>
+        <div className="aspect-square h-[2.5rem] w-[2.5rem]"></div>
       </div>
       <div className="pointer-events-none absolute right-0 z-10 h-full w-[2.5rem]" ref={railRef}>
         <div className="pointer-events-auto" ref={stickyRef}>
