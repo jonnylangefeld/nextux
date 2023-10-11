@@ -23,21 +23,21 @@ export default function MagicForm(props: Props) {
   const formRef: React.RefObject<Form<any, RJSFSchema, any>> = useRef(null)
   const stickyRef: React.RefObject<HTMLDivElement> = useRef(null)
   const railRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const tooltipRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   const handleScroll = () => {
     const railTop = railRef.current?.getBoundingClientRect().top || 0
     const railBottom = railRef.current?.getBoundingClientRect().bottom || 0
     const stickyHeight = stickyRef.current?.getBoundingClientRect().height || 0
-    const recordingButton = document.querySelector("#recording-button")
 
     if (railTop < 112) {
-      recordingButton?.classList.add(...["tooltip-left"])
-      recordingButton?.classList.remove(
+      tooltipRef.current?.classList.add(...["tooltip-left"])
+      tooltipRef.current?.classList.remove(
         ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
       )
     } else {
-      recordingButton?.classList.remove(...["tooltip-left"])
-      recordingButton?.classList.add(
+      tooltipRef.current?.classList.remove(...["tooltip-left"])
+      tooltipRef.current?.classList.add(
         ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
       )
     }
@@ -61,40 +61,42 @@ export default function MagicForm(props: Props) {
   }, [])
 
   return (
-    <div className="relative flex w-full max-w-xl flex-col gap-y-2">
-      <div className="flex flex-row items-start justify-between gap-x-3 sm:gap-x-16 lg:gap-x-32">
-        <div className="flex flex-col gap-y-2">
-          <div className="font-semibold md:text-2xl">
-            Fill out this demo form with your <Highlight>voice</Highlight> using the FormButler icon!
+    <>
+      <div className="relative flex w-full max-w-xl flex-col gap-y-2">
+        <div className="flex flex-row items-start justify-between gap-x-3 sm:gap-x-16 lg:gap-x-32">
+          <div className="flex flex-col gap-y-2">
+            <div className="font-semibold md:text-2xl">
+              Fill out this demo form with your <Highlight>voice</Highlight> using the FormButler icon!
+            </div>
+            <div>The data in this form won&apos;t get collected.</div>
           </div>
-          <div>The data in this form won&apos;t get collected.</div>
+          <div className="aspect-square h-[2.5rem] w-[2.5rem]"></div>
         </div>
-        <div className="aspect-square h-[2.5rem] w-[2.5rem]"></div>
-      </div>
-      <div className="pointer-events-none absolute right-0 z-10 h-full w-[2.5rem]" ref={railRef}>
-        <div className="pointer-events-auto" ref={stickyRef}>
-          <RecordingButton
-            id="recording-button"
-            className="tooltip-bottom md:tooltip-top before:translate-x-[-90%] lg:before:translate-x-[-50%]"
-            setFormData={setFormData}
-            formData={formData}
-            schema={props.schema}
-          />
+        <div className="pointer-events-none absolute right-0 z-10 h-full w-[2.5rem]" ref={railRef}>
+          <div className="pointer-events-auto" ref={stickyRef}>
+            <RecordingButton
+              tooltipRef={tooltipRef}
+              className="tooltip-bottom md:tooltip-top before:translate-x-[-90%] lg:before:translate-x-[-50%]"
+              setFormData={setFormData}
+              formData={formData}
+              schema={props.schema}
+            />
+          </div>
         </div>
+        <ThemedForm
+          ref={formRef}
+          formData={formData}
+          schema={props.schema}
+          validator={validator}
+          className="form-control w-full gap-y-2"
+          onSubmit={() =>
+            formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
+          }
+          onChange={(e) => setFormData(e.formData)}
+          showErrorList={false}
+        />
       </div>
-      <ThemedForm
-        ref={formRef}
-        formData={formData}
-        schema={props.schema}
-        validator={validator}
-        className="form-control w-full gap-y-2"
-        onSubmit={() =>
-          formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
-        }
-        onChange={(e) => setFormData(e.formData)}
-        showErrorList={false}
-      />
       <Confetti numberOfPieces={150} eventEmitter={formEventEmitter} />
-    </div>
+    </>
   )
 }
