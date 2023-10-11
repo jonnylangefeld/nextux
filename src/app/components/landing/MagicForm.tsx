@@ -91,6 +91,7 @@ export default function MagicForm(props: Props) {
         onSubmit={() =>
           formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
         }
+        onChange={(e) => setFormData(e.formData)}
         showErrorList={false}
       />
       <Confetti numberOfPieces={150} eventEmitter={formEventEmitter} />
