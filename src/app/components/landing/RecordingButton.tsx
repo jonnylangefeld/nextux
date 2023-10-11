@@ -2,7 +2,7 @@
 
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { RJSFSchema } from "@rjsf/utils"
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import * as Toast from "@/app/components/Toast"
 import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
@@ -32,11 +32,11 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
   setFormData: Dispatch<SetStateAction<object>>
   formData: object
   schema: RJSFSchema
+  tooltipRef: React.RefObject<HTMLDivElement>
 }
 
 export default function RecordingButton(props: Props) {
   const [recording, setRecording] = useState(false)
-  const [tooltipOpen, setTooltipOpen] = useState(true)
   const [pulse, setPulse] = useState(true)
   const [tooltipText, setTooltipText] = useState(initialToolTipMessages[0])
   const [tooltipMessages, setTooltipMessages] = useState<string[]>(initialToolTipMessages)
@@ -54,6 +54,14 @@ export default function RecordingButton(props: Props) {
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
   const skipExpensiveAPICalls = useHypertune().skipExpensiveAPICalls().get(false)
+
+  const setTooltipOpen = (open: boolean) => {
+    if (open) {
+      props.tooltipRef.current?.classList.add("tooltip-open")
+    } else {
+      props.tooltipRef.current?.classList.remove("tooltip-open")
+    }
+  }
 
   const apiRequest = async (body: ExtractRequest) => {
     const resp = await fetch("/api/extract", {
@@ -247,10 +255,8 @@ export default function RecordingButton(props: Props) {
 
   return (
     <div
-      id={props.id}
-      className={`${
-        tooltipOpen ? "tooltip-open" : ""
-      } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip before:max-w-[10rem] before:content-[attr(data-tip)] md:before:max-w-[20rem] ${
+      ref={props.tooltipRef}
+      className={`light:before:shadow-[0px_0px_28px_0px_#fff] tooltip-open tooltip before:max-w-[10rem] before:content-[attr(data-tip)] md:before:max-w-[20rem] ${
         props.className || ""
       }`}
       data-tip={tooltipText}
