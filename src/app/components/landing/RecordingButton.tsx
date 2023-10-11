@@ -2,7 +2,7 @@
 
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { RJSFSchema } from "@rjsf/utils"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import * as Toast from "@/app/components/Toast"
 import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
@@ -54,6 +54,8 @@ export default function RecordingButton(props: Props) {
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
   const skipExpensiveAPICalls = useHypertune().skipExpensiveAPICalls().get(false)
+  const placeholderRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const buttonRef: React.RefObject<HTMLDivElement> = useRef(null)
 
   const apiRequest = async (body: ExtractRequest) => {
     const resp = await fetch("/api/extract", {
@@ -235,30 +237,52 @@ export default function RecordingButton(props: Props) {
     }
   }
 
+  const handleScroll = () => {
+    const breakPoint = placeholderRef.current?.getBoundingClientRect().top || 0
+    if (breakPoint < 112) {
+      placeholderRef.current?.classList.add(...["h-[2.5rem]", "aspect-square"])
+      buttonRef.current?.classList.add(...["fixed", "top-[112px]", "tooltip-left"])
+      buttonRef.current?.classList.remove(
+        ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
+      )
+    } else {
+      placeholderRef.current?.classList.remove(...["h-[2.5rem]", "aspect-square"])
+      buttonRef.current?.classList.remove(...["fixed", "top-[112px]", "tooltip-left"])
+      buttonRef.current?.classList.add(
+        ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
+      )
+    }
+  }
+
   useEffect(() => {
     const intervalId = cycleTooltips(tooltipMessages)
     setTooltipCycler(intervalId)
+    window.addEventListener("scroll", handleScroll)
 
-    // Cleanup the interval on unmount
     return () => {
       clearInterval(intervalId)
+      window.removeEventListener("scroll", handleScroll)
     }
   }, [tooltipMessages])
 
   return (
-    <div
-      className={`${
-        tooltipOpen ? "tooltip-open" : ""
-      } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip tooltip-bottom md:tooltip-top before:max-w-[10rem] before:translate-x-[-90%] before:content-[attr(data-tip)] md:before:max-w-[20rem] lg:before:translate-x-[-50%]`}
-      data-tip={tooltipText}
-    >
-      <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
-        <div
-          className={`absolute -z-20 h-full w-full scale-100 ${
-            pulse ? "animate-pulse" : ""
-          } rounded-md bg-white blur-lg`}
-        />
-        <RiveComponent />
+    <div>
+      <div ref={placeholderRef}></div>
+      <div
+        ref={buttonRef}
+        className={`${
+          tooltipOpen ? "tooltip-open" : ""
+        } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip before:max-w-[10rem] before:content-[attr(data-tip)] md:before:max-w-[20rem]`}
+        data-tip={tooltipText}
+      >
+        <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
+          <div
+            className={`absolute -z-20 h-full w-full scale-100 ${
+              pulse ? "animate-pulse" : ""
+            } rounded-md bg-white blur-lg`}
+          />
+          <RiveComponent />
+        </div>
       </div>
     </div>
   )
