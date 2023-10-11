@@ -3,7 +3,7 @@
 import Form, { withTheme } from "@rjsf/core"
 import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
-import { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { EventEmitter } from "events"
 import Highlight from "./Highlight"
 import RecordingButton from "./RecordingButton"
@@ -21,9 +21,47 @@ export default function MagicForm(props: Props) {
   const [formData, setFormData] = useState({})
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formRef: React.RefObject<Form<any, RJSFSchema, any>> = useRef(null)
+  const stickyRef: React.RefObject<HTMLDivElement> = useRef(null)
+  const railRef: React.RefObject<HTMLDivElement> = useRef(null)
+
+  const handleScroll = () => {
+    const railTop = railRef.current?.getBoundingClientRect().top || 0
+    const railBottom = railRef.current?.getBoundingClientRect().bottom || 0
+    const stickyHeight = stickyRef.current?.getBoundingClientRect().height || 0
+    const recordingButton = document.querySelector("#recording-button")
+
+    if (railTop < 112) {
+      recordingButton?.classList.add(...["tooltip-left"])
+      recordingButton?.classList.remove(
+        ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
+      )
+    } else {
+      recordingButton?.classList.remove(...["tooltip-left"])
+      recordingButton?.classList.add(
+        ...["tooltip-bottom", "md:tooltip-top", "before:translate-x-[-90%]", "lg:before:translate-x-[-50%]"]
+      )
+    }
+    if (railTop < 112 && railBottom > 112 + stickyHeight) {
+      stickyRef.current?.classList.add(...["fixed", "top-[112px]"])
+    } else {
+      stickyRef.current?.classList.remove(...["fixed", "top-[112px]"])
+    }
+    if (railBottom <= 112 + stickyHeight) {
+      stickyRef.current?.classList.add(...["absolute", "bottom-0"])
+    } else {
+      stickyRef.current?.classList.remove(...["absolute", "bottom-0"])
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll)
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
 
   return (
-    <div className="flex w-full max-w-xl flex-col gap-y-2">
+    <div className="relative flex w-full max-w-xl flex-col gap-y-2">
       <div className="flex flex-row items-start justify-between gap-x-3 sm:gap-x-16 lg:gap-x-32">
         <div className="flex flex-col gap-y-2">
           <div className="font-semibold md:text-2xl">
@@ -31,7 +69,18 @@ export default function MagicForm(props: Props) {
           </div>
           <div>The data in this form won&apos;t get collected.</div>
         </div>
-        <RecordingButton setFormData={setFormData} formData={formData} schema={props.schema} />
+        <div className="aspect-square w-[2.5rem]"></div>
+      </div>
+      <div className="pointer-events-none absolute right-0 z-10 h-full w-[2.5rem]" ref={railRef}>
+        <div className="pointer-events-auto" ref={stickyRef}>
+          <RecordingButton
+            id="recording-button"
+            className="tooltip-bottom md:tooltip-top before:translate-x-[-90%] lg:before:translate-x-[-50%]"
+            setFormData={setFormData}
+            formData={formData}
+            schema={props.schema}
+          />
+        </div>
       </div>
       <ThemedForm
         ref={formRef}
