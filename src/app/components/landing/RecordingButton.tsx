@@ -2,7 +2,7 @@
 
 import { useRive, useStateMachineInput } from "@rive-app/react-canvas"
 import { RJSFSchema } from "@rjsf/utils"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react"
 import * as Toast from "@/app/components/Toast"
 import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
@@ -28,7 +28,7 @@ if (!webmSupported) {
 const initialToolTipMessages = ["Click the FormButler icon to help you fill out this form", "Try it out!"]
 const tooltipDuration = 5000
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   setFormData: Dispatch<SetStateAction<object>>
   formData: object
   schema: RJSFSchema
@@ -247,9 +247,12 @@ export default function RecordingButton(props: Props) {
 
   return (
     <div
+      id={props.id}
       className={`${
         tooltipOpen ? "tooltip-open" : ""
-      } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip tooltip-bottom md:tooltip-top before:max-w-[10rem] before:translate-x-[-90%] before:content-[attr(data-tip)] md:before:max-w-[20rem] lg:before:translate-x-[-50%]`}
+      } light:before:shadow-[0px_0px_28px_0px_#fff] tooltip before:max-w-[10rem] before:content-[attr(data-tip)] md:before:max-w-[20rem] ${
+        props.className || ""
+      }`}
       data-tip={tooltipText}
     >
       <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
