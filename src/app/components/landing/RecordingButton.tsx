@@ -96,7 +96,6 @@ export default function RecordingButton(props: Props) {
       return
     }
     props.setFormData(json)
-    recordingRef.current = "stopped"
   }
 
   const animateFrequencies = (analyser: AnalyserNode) => {
@@ -152,6 +151,7 @@ export default function RecordingButton(props: Props) {
       if (tooltipCycler) {
         clearInterval(tooltipCycler)
       }
+      recordingRef.current = "stopped"
     })
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
