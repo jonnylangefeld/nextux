@@ -2,7 +2,7 @@ import crypto from "crypto"
 import { FileType } from "../types"
 
 const magicNumbers: Record<FileType, string> = {
-  [FileType.MP3]: "fffb94",
+  [FileType.MP3]: "ff",
   [FileType.WEBM]: "1a45df",
   [FileType.MP4]: "0000001c6674",
   [FileType.WAV]: "52494646",

@@ -28,6 +28,8 @@ if (!webmSupported) {
 const initialToolTipMessages = ["Click the FormButler icon to help you fill out this form", "Try it out!"]
 const tooltipDuration = 5000
 
+type recording = "stopped" | "started"
+
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   setFormData: Dispatch<SetStateAction<object>>
   formData: object
@@ -36,7 +38,8 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export default function RecordingButton(props: Props) {
-  const [recording, setRecording] = useState(false)
+  const recordingRef = useRef<recording>("stopped")
+  const frameRef: React.RefObject<HTMLDivElement> = useRef(null)
   const [pulse, setPulse] = useState(true)
   const [tooltipText, setTooltipText] = useState(initialToolTipMessages[0])
   const [tooltipMessages, setTooltipMessages] = useState<string[]>(initialToolTipMessages)
@@ -54,6 +57,14 @@ export default function RecordingButton(props: Props) {
   const animateLeft = useStateMachineInput(rive, "recording", "left")
   const animateRight = useStateMachineInput(rive, "recording", "right")
   const skipExpensiveAPICalls = useHypertune().skipExpensiveAPICalls().get(false)
+
+  const setDisableRecordingButton = (disabled: boolean) => {
+    if (disabled) {
+      frameRef.current?.classList.add("pointer-events-none")
+    } else {
+      frameRef.current?.classList.remove("pointer-events-none")
+    }
+  }
 
   const setTooltipOpen = (open: boolean) => {
     if (open) {
@@ -140,6 +151,7 @@ export default function RecordingButton(props: Props) {
       if (tooltipCycler) {
         clearInterval(tooltipCycler)
       }
+      recordingRef.current = "stopped"
     })
 
     mediaRecorder.addEventListener("dataavailable", (event) => {
@@ -170,6 +182,7 @@ export default function RecordingButton(props: Props) {
             ]
             setTooltipText(newMessages[0])
             setTooltipMessages(newMessages)
+            setDisableRecordingButton(false)
           }
         }
 
@@ -181,7 +194,7 @@ export default function RecordingButton(props: Props) {
   const startRecording = (mediaRecorder: MediaRecorder) => {
     mediaRecorder.start()
     setMediaRecorder(mediaRecorder)
-    setRecording(true)
+    recordingRef.current = "started"
     animateStart?.fire()
     setPulse(false)
     if (tooltipCycler) {
@@ -202,45 +215,58 @@ export default function RecordingButton(props: Props) {
     // Stop all tracks to ensure that the microphone is released
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
-    setRecording(false)
   }
 
-  const handleRecording = () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      Toast.error(["WebRTC not supported"])
-      return
-    }
-
+  const handleStream = async (streamPromise: Promise<MediaStream>) => {
     const audioContext = new AudioContext()
     const analyser = audioContext.createAnalyser()
     analyser.fftSize = 256 // Reducing FFT size for quicker analysis
     analyser.smoothingTimeConstant = 0.1
 
-    if (recording && mediaRecorder) {
-      stopRecording(mediaRecorder)
-    } else {
-      // Request permission and start recording once the the button is clicked
-      setTooltipOpen(false)
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          setTooltipOpen(true)
-          const newMediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" })
+    // Request permission and start recording once the the button is clicked
+    streamPromise
+      .then((stream) => {
+        setTooltipOpen(true)
+        const newMediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" })
 
-          const source = audioContext.createMediaStreamSource(stream)
-          source.connect(analyser)
+        const source = audioContext.createMediaStreamSource(stream)
+        source.connect(analyser)
 
-          // Check amplitude periodically
-          const animateFrequenciesInterval = animateFrequencies(analyser)
+        // Check amplitude periodically
+        const animateFrequenciesInterval = animateFrequencies(analyser)
 
-          addStopEvents(newMediaRecorder, animateFrequenciesInterval)
+        addStopEvents(newMediaRecorder, animateFrequenciesInterval)
 
-          startRecording(newMediaRecorder)
-        })
-        .catch(() => {
-          Toast.error(["Permission to use microphone not given.", "Click 'Reset permission' in your browser settings."])
-        })
+        startRecording(newMediaRecorder)
+      })
+      .catch(() => {
+        Toast.error(["Permission to use microphone not given.", "Click 'Reset permission' in your browser settings."])
+      })
+      // adding this timeout fixed a bug in safari where it always takes a while
+      // for the microphone to start listening. During that time button clicks were queue by the browser even despite
+      // the class `pointer-events-none`. The click events were processed only once the stream was available, which
+      // was the immediately after the `pointer-events-none` class was removed.
+      // This timeout makes sure that these queued up button clicks during the microphone activation don't get counted.
+      .finally(() => setTimeout(() => setDisableRecordingButton(false), 500))
+  }
+
+  const handleRecording = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      Toast.error(["WebRTC not supported"])
+      return
     }
+
+    setDisableRecordingButton(true)
+
+    if (recordingRef.current === "started" && mediaRecorder) {
+      stopRecording(mediaRecorder)
+      return
+    }
+
+    setTooltipOpen(false)
+    setTimeout(async () => {
+      await handleStream(navigator.mediaDevices.getUserMedia({ audio: true }))
+    }, 0)
   }
 
   useEffect(() => {
@@ -261,7 +287,7 @@ export default function RecordingButton(props: Props) {
       }`}
       data-tip={tooltipText}
     >
-      <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording}>
+      <div className="relative aspect-square w-[2.5rem] cursor-pointer" onClick={handleRecording} ref={frameRef}>
         <div
           className={`absolute -z-20 h-full w-full scale-100 ${
             pulse ? "animate-pulse" : ""
