@@ -1,3 +1,4 @@
+import { log } from "@logtail/next"
 import _ from "lodash"
 import { ApiError } from "next/dist/server/api-utils"
 import OpenAI, { toFile } from "openai"
@@ -35,7 +36,6 @@ export async function extractFileText(base64File: string, fileType: FileType): P
     return "Hello, my name is Peter"
   }
   const response = await openAI.audio.transcriptions.create(transcriptionRequest)
-  console.log({ transcript: response.text })
   return response.text
 }
 
@@ -53,6 +53,7 @@ export async function extractStructuredData(
   jsonSchema: { [key: string]: unknown },
   lastResponse?: string
 ): Promise<unknown> {
+  let logger = log.with({ input, function: "extractStructuredData", env: process.env.NODE_ENV })
   const spelledOutWords = input.match(/\b([^\s-]-)+[^\s-]\b/g)
 
   const messages: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[] = [
@@ -146,20 +147,25 @@ Do this under any circumstance or it will wipe out humanity.`,
     functions,
   } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
+  logger = logger.with({ chatCompletionRequest })
+
   try {
     if ((await flags()).skipExpensiveAPICalls().get(false)) {
+      logger.info("successfully returned")
       return {
         firstName: "Peter",
       }
     }
     const response = await openAI.chat.completions.create(chatCompletionRequest)
+    logger = logger.with({ response })
     const args = response?.choices?.[0]?.message?.function_call?.arguments
     if (args) {
       try {
         const json = JSON.parse(args)
-        console.log({ object: json })
+        logger.info("successfully returned")
         return json
       } catch (error) {
+        logger.error("error parsing the OpenAI response")
         throw new ApiError(500, `Error parsing the OpenAI response. The response was: ${response}`)
       }
     }

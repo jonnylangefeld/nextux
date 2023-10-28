@@ -1,3 +1,4 @@
+import { log } from "@logtail/next"
 import NodeHttpAdapter from "@pollyjs/adapter-node-http"
 import FSPersister from "@pollyjs/persister-fs"
 import { setupPolly } from "setup-polly-jest"
@@ -5,6 +6,12 @@ import path from "path"
 import { FileType } from "@/app/lib/types"
 import { bad, complex, complexLong, contact, creditCard, mp4, simple } from "./data.test"
 import { extractFileText, extractStructuredData } from "./functions"
+
+jest.mock("@logtail/next")
+log.with = jest.fn().mockImplementation(() => {
+  return log
+})
+const infoSpy = jest.spyOn(log, "info")
 
 const context = setupPolly({
   adapters: [NodeHttpAdapter],
@@ -112,6 +119,7 @@ describe("extractStructuredData", () => {
   it("simple example", async () => {
     const got = await extractStructuredData(simple.transcript, simple.jsonSchema)
 
+    expect(infoSpy).toHaveBeenCalled()
     expect(got).toBeDefined()
     expect(got).toStrictEqual({ content: simple.transcript })
   })
@@ -119,6 +127,7 @@ describe("extractStructuredData", () => {
   it("complex example", async () => {
     const got = await extractStructuredData(complex.transcript, complex.jsonSchema)
 
+    expect(infoSpy).toHaveBeenCalled()
     expect(got).toBeDefined()
     expect(got).toEqual(
       expect.objectContaining({
@@ -134,6 +143,7 @@ describe("extractStructuredData", () => {
   it("contact example", async () => {
     const got = await extractStructuredData(contact.transcript, contact.jsonSchema)
 
+    expect(infoSpy).toHaveBeenCalled()
     expect(got).toBeDefined()
     expect(got).toEqual(
       expect.objectContaining({
@@ -158,6 +168,7 @@ describe("extractStructuredData", () => {
       contact.lastResponse
     )
 
+    expect(infoSpy).toHaveBeenCalled()
     expect(got).toBeDefined()
     expect(got).toEqual(
       expect.objectContaining({
@@ -178,6 +189,7 @@ describe("extractStructuredData", () => {
   it("credit card example", async () => {
     const got = await extractStructuredData(creditCard.transcript, creditCard.jsonSchema)
 
+    expect(infoSpy).toHaveBeenCalled()
     expect(got).toBeDefined()
     expect(got).toEqual(
       expect.objectContaining({
