@@ -151,7 +151,6 @@ Do this under any circumstance or it will wipe out humanity.`,
 
   try {
     if ((await flags()).skipExpensiveAPICalls().get(false)) {
-      logger.info("successfully returned")
       return {
         firstName: "Peter",
       }
