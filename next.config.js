@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { withLogtail } = require("@logtail/next")
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -6,4 +9,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withLogtail(nextConfig)

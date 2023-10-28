@@ -18,6 +18,18 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 Feature flags are set via [Hypertune](https://hypertune.com). To change them navigate [here](https://app.hypertune.com/projects/2736/draft). Reload the page after changing variables. The setup is explained in their [Quickstart](https://docs.hypertune.com/getting-started/feature-flags-quickstart).
 
+## Logging
+
+Logs are sent to [Betterstack](https://beterstack.com). To view them navigate [here](https://logs.betterstack.com/team/210187/tail). The setup is explained in their [Quickstart](https://betterstack.com/docs/logs/javascript/nextjs/). Use them like the following:
+
+```ts
+import { log } from "@logtail/next"
+
+log.info("")
+log.warn("")
+// etc.
+```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

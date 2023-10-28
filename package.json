@@ -15,6 +15,7 @@
     "feature-flags": "hypertune"
   },
   "dependencies": {
+    "@logtail/next": "^0.1.0",
     "@phosphor-icons/react": "^2.0.13",
     "@rive-app/react-canvas": "^4.1.6",
     "@rjsf/core": "^5.12.1",
