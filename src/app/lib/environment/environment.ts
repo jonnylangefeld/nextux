@@ -14,5 +14,6 @@ export function requireEnvVariable(name: string): string {
 
 export const env = {
   OPENAI_API_KEY: requireEnvVariable("OPENAI_API_KEY"),
+  PLUNK_TOKEN: requireEnvVariable("PLUNK_TOKEN"),
   LOGTAIL_SOURCE_TOKEN: process.env.LOGTAIL_SOURCE_TOKEN,
 }

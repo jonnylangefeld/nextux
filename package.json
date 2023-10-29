@@ -17,6 +17,8 @@
   "dependencies": {
     "@logtail/next": "^0.1.0",
     "@phosphor-icons/react": "^2.0.13",
+    "@plunk/node": "^3.0.0",
+    "@react-email/components": "^0.0.7",
     "@rive-app/react-canvas": "^4.1.6",
     "@rjsf/core": "^5.12.1",
     "@rjsf/utils": "^5.12.1",
@@ -35,7 +37,7 @@
     "encoding": "^0.1.13",
     "hypertune": "^1.7.3",
     "lodash": "^4.17.21",
-    "next": "13.4.6",
+    "next": "^13.5.6",
     "openai": "^4.0.0-beta.7",
     "postcss": "8.4.24",
     "react": "18.2.0",

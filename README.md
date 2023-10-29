@@ -30,6 +30,10 @@ log.warn("")
 // etc.
 ```
 
+## Emails
+
+Emails are being programmatically sent using [Plunk](https://app.useplunk.com/).
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
