@@ -10,7 +10,7 @@ export default function WaitListEmail() {
         <Body className="m-auto font-sans">
           <Container className="mx-auto my-10 w-[465px] p-5">
             <Heading className="mx-0 my-8 p-0 text-center text-2xl font-normal">
-              Thank you for joining the <strong>nextUX</strong>, wait list!
+              Thank you for joining the <strong>nextUX</strong>, waitlist!
             </Heading>
             <Text className="text-sm">Hi 👋🏼</Text>
             <Text className="text-sm">

@@ -41,12 +41,12 @@ export default function WaitList() {
           waitListModal.current?.showModal()
         }}
       >
-        Join the wait list! 🚀
+        Join the waitlist! 🚀
       </Button>
       <dialog ref={waitListModal} className="modal z-20">
         <div className="modal-box min-w-min">
           <div className="flex flex-col gap-2">
-            <h3 className="text-lg font-bold">Wait List</h3>
+            <h3 className="text-lg font-bold">Waitlist</h3>
             <p>Sign up with your email so we can send you updates!</p>
           </div>
           <form method="post" className="flex flex-col gap-y-2 pt-4 sm:join sm:flex-row" onSubmit={handleSubmit}>
