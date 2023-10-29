@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from "react"
 import * as Toast from "@/app/components/Toast"
-import { enterWaitList } from "@/app/lib/actions"
+import { enterWaitList } from "@/app/lib/actions/actions"
 import Button from "../Button"
 
 export default function WaitList() {
@@ -59,7 +59,7 @@ export default function WaitList() {
               required
             />
             <button className="join-item btn min-w-[120px]">
-              {loading ? <span className="loading loading-dots loading-md" /> : "Join!"}
+              {loading ? <span className="loading loading-dots loading-md" /> : "Join"}
             </button>
           </form>
         </div>

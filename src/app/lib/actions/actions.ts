@@ -3,8 +3,8 @@
 import { log } from "@logtail/next"
 import Plunk from "@plunk/node"
 import { render } from "@react-email/render"
-import { env } from "./environment/environment"
-import WaitListEmail from "../components/landing/WaitListEmail"
+import WaitListEmail from "../../components/landing/WaitListEmail"
+import { env } from "../environment/environment"
 
 const plunk = new Plunk(env.PLUNK_TOKEN)
 const body = render(WaitListEmail())
