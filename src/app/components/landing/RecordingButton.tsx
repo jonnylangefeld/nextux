@@ -8,6 +8,7 @@ import useHypertune from "@/app/lib/hypertune/useHypertune"
 import { ExtractRequest } from "@/app/lib/proto/types"
 
 const webmSupported = typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/webm")
+const maxRecordingMS = 60000
 
 if (!webmSupported) {
   // Dynamically import the polyfill if 'audio/webm' is not supported
@@ -45,6 +46,7 @@ export default function RecordingButton(props: Props) {
   const [tooltipMessages, setTooltipMessages] = useState<string[]>(initialToolTipMessages)
   const [tooltipCycler, setTooltipCycler] = useState<NodeJS.Timer | null>(null)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [recordingTimeout, setRecordingTimeout] = useState<NodeJS.Timeout | null>(null)
   const { rive, RiveComponent } = useRive({
     src: "/formbutler.riv",
     stateMachines: "recording",
@@ -209,9 +211,21 @@ export default function RecordingButton(props: Props) {
       "You can say things like 'my name is Peter, that's P-E-T-E-R'",
       "Click the FormButler icon again to stop recording",
     ])
+
+    const timeoutId = setTimeout(() => {
+      if (recordingRef.current === "started" && mediaRecorder) {
+        Toast.info(["⏱️ Keep it short! The maximum recording length is 1 minute."])
+        stopRecording(mediaRecorder)
+      }
+    }, maxRecordingMS)
+    setRecordingTimeout(timeoutId)
   }
 
   const stopRecording = (mediaRecorder: MediaRecorder) => {
+    if (recordingTimeout) {
+      clearTimeout(recordingTimeout)
+      setRecordingTimeout(null)
+    }
     // Stop all tracks to ensure that the microphone is released
     mediaRecorder.stop()
     mediaRecorder.stream.getTracks().forEach((track) => track.stop())
@@ -243,7 +257,7 @@ export default function RecordingButton(props: Props) {
         Toast.error(["Permission to use microphone not given.", "Click 'Reset permission' in your browser settings."])
       })
       // adding this timeout fixed a bug in safari where it always takes a while
-      // for the microphone to start listening. During that time button clicks were queue by the browser even despite
+      // for the microphone to start listening. During that time button clicks were queued by the browser even despite
       // the class `pointer-events-none`. The click events were processed only once the stream was available, which
       // was the immediately after the `pointer-events-none` class was removed.
       // This timeout makes sure that these queued up button clicks during the microphone activation don't get counted.
