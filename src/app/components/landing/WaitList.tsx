@@ -49,7 +49,7 @@ export default function WaitList() {
             <h3 className="text-lg font-bold">Wait List</h3>
             <p>Sign up with your email so we can send you updates!</p>
           </div>
-          <form method="post" className="flex flex-col gap-y-2 pt-4 sm:join sm:block" onSubmit={handleSubmit}>
+          <form method="post" className="flex flex-col gap-y-2 pt-4 sm:join sm:flex-row" onSubmit={handleSubmit}>
             <input
               type="email"
               className="input-bordered input join-item"
@@ -59,7 +59,7 @@ export default function WaitList() {
               required
             />
             <button className="join-item btn min-w-[120px]">
-              {loading ? <span className="loading loading-dots loading-md" /> : "Subscribe"}
+              {loading ? <span className="loading loading-dots loading-md" /> : "Join!"}
             </button>
           </form>
         </div>
