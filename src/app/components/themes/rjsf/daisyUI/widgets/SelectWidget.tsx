@@ -41,7 +41,7 @@ function SelectWidget<T = any, S extends StrictRJSFSchema = RJSFSchema, F extend
             <input
               type="checkbox"
               className="checkbox"
-              checked={value.includes(optionValue)}
+              checked={value?.includes(optionValue)}
               disabled={disabled || readonly}
               autoFocus={autofocus && i === 0} // Only the first checkbox should receive the autofocus.
               onChange={(event: ChangeEvent<HTMLInputElement>) =>

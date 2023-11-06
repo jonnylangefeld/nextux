@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 
-export default function Section() {
+export default function Background() {
   const generatePolygon = () => {
     let path = ""
     for (let i = 0; i < 15; i++) {
