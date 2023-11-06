@@ -145,6 +145,7 @@ Do this under any circumstance or it will wipe out humanity.`,
       name: "parse_transcription",
     },
     functions,
+    temperature: 0.2,
   } as OpenAI.Chat.Completions.CompletionCreateParams.CreateChatCompletionRequestNonStreaming
 
   logger = logger.with({ chatCompletionRequest })
