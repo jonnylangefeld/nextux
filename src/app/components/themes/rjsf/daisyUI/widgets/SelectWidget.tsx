@@ -6,14 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import {
-  ariaDescribedByIds,
-  enumOptionsIndexForValue,
-  FormContextType,
-  RJSFSchema,
-  StrictRJSFSchema,
-  WidgetProps,
-} from "@rjsf/utils"
+import { ariaDescribedByIds, FormContextType, RJSFSchema, StrictRJSFSchema, WidgetProps } from "@rjsf/utils"
 import { ChangeEvent } from "react"
 
 function SelectWidget<T = any, S extends StrictRJSFSchema = RJSFSchema, F extends FormContextType = any>({
@@ -26,7 +19,6 @@ function SelectWidget<T = any, S extends StrictRJSFSchema = RJSFSchema, F extend
   onChange,
   onBlur,
   onFocus,
-  placeholder,
 }: WidgetProps<T, S, F>) {
   const { enumOptions } = options
 
