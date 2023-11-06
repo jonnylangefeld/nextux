@@ -9,94 +9,63 @@
 import {
   ariaDescribedByIds,
   enumOptionsIndexForValue,
-  enumOptionsValueForIndex,
   FormContextType,
   RJSFSchema,
   StrictRJSFSchema,
   WidgetProps,
 } from "@rjsf/utils"
-import { ChangeEvent, FocusEvent, SyntheticEvent, useCallback } from "react"
-
-function getValue(event: SyntheticEvent<HTMLSelectElement>, multiple: boolean) {
-  if (multiple) {
-    return Array.from((event.target as HTMLSelectElement).options)
-      .slice()
-      .filter((o) => o.selected)
-      .map((o) => o.value)
-  }
-  return (event.target as HTMLSelectElement).value
-}
+import { ChangeEvent } from "react"
 
 function SelectWidget<T = any, S extends StrictRJSFSchema = RJSFSchema, F extends FormContextType = any>({
-  schema,
   id,
   options,
   value,
-  required,
   disabled,
   readonly,
-  multiple = false,
   autofocus = false,
   onChange,
   onBlur,
   onFocus,
   placeholder,
 }: WidgetProps<T, S, F>) {
-  const { enumOptions, enumDisabled, emptyValue: optEmptyVal } = options
-  const emptyValue = multiple ? [] : ""
+  const { enumOptions } = options
 
-  const handleFocus = useCallback(
-    (event: FocusEvent<HTMLSelectElement>) => {
-      const newValue = getValue(event, multiple)
-      return onFocus(id, enumOptionsValueForIndex<S>(newValue, enumOptions, optEmptyVal))
-    },
-    [onFocus, id, schema, multiple, options]
-  )
-
-  const handleBlur = useCallback(
-    (event: FocusEvent<HTMLSelectElement>) => {
-      const newValue = getValue(event, multiple)
-      return onBlur(id, enumOptionsValueForIndex<S>(newValue, enumOptions, optEmptyVal))
-    },
-    [onBlur, id, schema, multiple, options]
-  )
-
-  const handleChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const newValue = getValue(event, multiple)
-      return onChange(enumOptionsValueForIndex<S>(newValue, enumOptions, optEmptyVal))
-    },
-    [onChange, schema, multiple, options]
-  )
-
-  const selectedIndexes = enumOptionsIndexForValue<S>(value, enumOptions, multiple)
+  const handleCheckboxChange = (checked: boolean, optionValue: string) => {
+    // Ensure that newValue is always an array
+    let newValue: any[] = Array.isArray(value) ? [...value] : []
+    if (checked) {
+      newValue.push(optionValue)
+    } else {
+      newValue = newValue.filter((v: any) => v !== optionValue)
+    }
+    onChange(newValue)
+  }
 
   return (
-    <select
-      id={id}
-      name={id}
-      multiple={multiple}
-      className="select-bordered select w-full"
-      value={typeof selectedIndexes === "undefined" ? emptyValue : selectedIndexes}
-      required={required}
-      disabled={disabled || readonly}
-      autoFocus={autofocus}
-      onBlur={handleBlur}
-      onFocus={handleFocus}
-      onChange={handleChange}
-      aria-describedby={ariaDescribedByIds<T>(id)}
-    >
-      {!multiple && schema.default === undefined && <option value="">{placeholder}</option>}
-      {Array.isArray(enumOptions) &&
-        enumOptions.map(({ value, label }, i) => {
-          const disabled = enumDisabled && enumDisabled.indexOf(value) !== -1
-          return (
-            <option key={i} value={String(i)} disabled={disabled}>
-              {label}
-            </option>
-          )
-        })}
-    </select>
+    <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+      {enumOptions?.map(({ value: optionValue, label }, i) => (
+        <div key={i} className="form-control">
+          <label className="flex cursor-pointer flex-row gap-x-2">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={value.includes(optionValue)}
+              disabled={disabled || readonly}
+              autoFocus={autofocus && i === 0} // Only the first checkbox should receive the autofocus.
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleCheckboxChange(event.target.checked, optionValue)
+              }
+              id={`${id}_${i}`}
+              name={`${id}_${i}`}
+              onBlur={(event) => onBlur && onBlur(id, event.target.value)}
+              onFocus={(event) => onFocus && onFocus(id, event.target.value)}
+              aria-describedby={ariaDescribedByIds<T>(id)}
+            />
+            <span className="label-text">{label}</span>
+          </label>
+        </div>
+      ))}
+    </div>
   )
 }
 
