@@ -55,9 +55,8 @@ function RadioWidget<T = any, S extends StrictRJSFSchema = RJSFSchema, F extends
           const handleChange = () => onChange(option.value)
 
           const radio = (
-            <div className="flex flex-row gap-x-2">
+            <div key={i} className="flex flex-row gap-x-2">
               <input
-                key={i}
                 type="radio"
                 className="radio"
                 id={optionId(id, i)}
