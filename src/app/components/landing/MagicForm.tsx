@@ -68,7 +68,6 @@ export default function MagicForm(props: Props) {
             <div className="font-semibold md:text-2xl">
               Fill out this demo form with your <Highlight>voice</Highlight> using the FormButler icon!
             </div>
-            <div>The data in this form won&apos;t get collected.</div>
           </div>
           <div className="aspect-square h-[2.5rem] w-[2.5rem]"></div>
         </div>
