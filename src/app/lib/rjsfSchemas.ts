@@ -50,9 +50,3 @@ export const wittyFormSchema: RJSFSchema = {
   },
   required: ["superpower", "fictionalCity", "desertedIslandItems", "timeTravelDate"],
 }
-
-export const wittyFormUISchema: UiSchema = {
-  fictionalCity: {
-    "ui:widget": "radio",
-  },
-}
