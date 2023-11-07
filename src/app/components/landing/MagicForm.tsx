@@ -15,7 +15,6 @@ const formEventEmitter = new EventEmitter()
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   schema: RJSFSchema
-  uiSchema: UiSchema
 }
 
 export default function MagicForm(props: Props) {
@@ -87,7 +86,6 @@ export default function MagicForm(props: Props) {
           ref={formRef}
           formData={formData}
           schema={props.schema}
-          uiSchema={props.uiSchema}
           validator={validator}
           className="form-control w-full gap-y-2"
           onSubmit={() =>
