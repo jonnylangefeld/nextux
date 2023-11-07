@@ -1,4 +1,4 @@
-import { RJSFSchema, UiSchema } from "@rjsf/utils"
+import { RJSFSchema } from "@rjsf/utils"
 
 export const wittyFormSchema: RJSFSchema = {
   $schema: "http://json-schema.org/draft-07/schema#",
