@@ -11,7 +11,7 @@ function SelectOrRadioWidget(props: WidgetProps) {
   const { schema } = props
 
   // Choose the RadioWidget for single selections
-  if (schema.type !== "boolean" && schema.enum) {
+  if ((schema.type !== "boolean" && schema.enum) || schema.oneOf !== undefined) {
     return <RadioWidget {...props} />
   }
 
