@@ -42,7 +42,7 @@ export default function Hero() {
 
   return (
     <Section>
-      <div className="h-screen" ref={screenRef} />
+      <div className="h-[100svh]" ref={screenRef} />
       <div className={`flex h-screen w-fit ${items}`}>
         <div
           className={`flex max-w-lg flex-col ${translate} items-center justify-center gap-y-10 text-center`}

@@ -1,20 +1,19 @@
 "use client"
 
 import Form, { withTheme } from "@rjsf/core"
-import { RJSFSchema, UiSchema } from "@rjsf/utils"
+import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import React, { useEffect, useRef, useState } from "react"
-import { EventEmitter } from "events"
+import EventEmitter from "events"
 import Highlight from "./Highlight"
 import RecordingButton from "./RecordingButton"
-import Confetti from "../Confetti"
 import daisyUI from "../themes/rjsf/daisyUI"
 
 const ThemedForm = withTheme(daisyUI)
-const formEventEmitter = new EventEmitter()
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   schema: RJSFSchema
+  submitEventEmitter: EventEmitter
 }
 
 export default function MagicForm(props: Props) {
@@ -89,13 +88,15 @@ export default function MagicForm(props: Props) {
           validator={validator}
           className="form-control w-full gap-y-2"
           onSubmit={() =>
-            formEventEmitter.emit("fire", formRef.current?.formElement.current.querySelector('button[type="submit"]'))
+            props.submitEventEmitter.emit(
+              "fire",
+              formRef.current?.formElement.current.querySelector('button[type="submit"]')
+            )
           }
           onChange={(e) => setFormData(e.formData)}
           showErrorList={false}
         />
       </div>
-      <Confetti numberOfPieces={150} eventEmitter={formEventEmitter} />
     </>
   )
 }
