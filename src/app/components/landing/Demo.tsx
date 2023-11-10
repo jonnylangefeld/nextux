@@ -4,10 +4,14 @@ import { json, jsonParseLinter } from "@codemirror/lang-json"
 import { linter, lintGutter } from "@codemirror/lint"
 import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror"
 import React, { useState } from "react"
+import EventEmitter from "events"
 import { wittyFormSchema } from "@/app/lib/rjsfSchemas"
 import Frame from "./Frame"
 import MagicForm from "./MagicForm"
 import RotatingCard from "./RotatingCard"
+import Confetti from "../Confetti"
+
+const submitEventEmitter = new EventEmitter()
 
 export default function Demo() {
   const [jsonSchema, setJSONSchema] = useState(JSON.stringify(wittyFormSchema, null, 2))
@@ -23,12 +27,13 @@ export default function Demo() {
   }, [])
   return (
     <>
+      <Confetti numberOfPieces={150} eventEmitter={submitEventEmitter} />
       <RotatingCard
         frontLabel="Try"
         backLabel="Edit"
         frontElement={
           <Frame>
-            <MagicForm schema={JSON.parse(jsonSchema)} />
+            <MagicForm schema={JSON.parse(jsonSchema)} submitEventEmitter={submitEventEmitter} />
           </Frame>
         }
         backElement={
