@@ -41,9 +41,14 @@ export default function MagicForm(props: Props) {
       )
     }
     if (railTop < 112 && railBottom > 112 + stickyHeight) {
-      stickyRef.current?.classList.add(...["fixed", "top-[112px]"])
+      // ideally this would be a `fixed` position from the top. But `fixed` doesn't work in any child of a transformed div.
+      // And we want to be able to use this component in a transformed div.
+      // https://stackoverflow.com/questions/15194313/transform3d-not-working-with-position-fixed-children/15256339#15256339
+      stickyRef.current?.classList.add(...["relative"])
+      stickyRef.current?.style.setProperty("top", `${112 - railTop}px`)
     } else {
-      stickyRef.current?.classList.remove(...["fixed", "top-[112px]"])
+      stickyRef.current?.classList.remove(...["relative"])
+      stickyRef.current?.style.removeProperty("top")
     }
     if (railBottom <= 112 + stickyHeight) {
       stickyRef.current?.classList.add(...["absolute", "bottom-0"])
