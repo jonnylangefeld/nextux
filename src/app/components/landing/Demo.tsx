@@ -8,7 +8,6 @@ import { wittyFormSchema } from "@/app/lib/rjsfSchemas"
 import Frame from "./Frame"
 import MagicForm from "./MagicForm"
 import RotatingCard from "./RotatingCard"
-import Section from "./Section"
 
 export default function Demo() {
   const [jsonSchema, setJSONSchema] = useState(JSON.stringify(wittyFormSchema, null, 2))
@@ -23,7 +22,7 @@ export default function Demo() {
     }
   }, [])
   return (
-    <Section className="z-10 -mt-44" id="demo">
+    <>
       <RotatingCard
         frontLabel="Try"
         backLabel="Edit"
@@ -62,6 +61,6 @@ export default function Demo() {
           </div>
         }
       />
-    </Section>
+    </>
   )
 }

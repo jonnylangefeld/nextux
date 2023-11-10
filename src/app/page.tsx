@@ -1,9 +1,10 @@
 import dynamic from "next/dynamic"
 import Content from "@/app/components/landing/Content"
+import DemoSkeleton from "@/app/components/landing/DemoSkeleton"
 import Foo from "@/app/components/landing/Footer"
 import Header from "@/app/components/landing/Header"
 import Hero from "@/app/components/landing/Hero"
-import MagicFormSkeleton from "@/app/components/landing/MagicFormSkeleton"
+import Section from "@/app/components/landing/Section"
 
 const Background = dynamic(() => import("@/app/components/landing/Background"), {
   ssr: false,
@@ -12,7 +13,7 @@ const Background = dynamic(() => import("@/app/components/landing/Background"), 
 export default function Home() {
   const Demo = dynamic(() => import("@/app/components/landing/Demo"), {
     ssr: false,
-    loading: () => <MagicFormSkeleton />,
+    loading: () => <DemoSkeleton />,
   })
 
   return (
@@ -21,7 +22,9 @@ export default function Home() {
       <Header />
       <Content>
         <Hero />
-        <Demo />
+        <Section className="z-10 -mt-44" id="demo">
+          <Demo />
+        </Section>
         <Foo />
       </Content>
     </>
