@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic"
 import Content from "@/app/components/landing/Content"
 import DemoSkeleton from "@/app/components/landing/DemoSkeleton"
-import Foo from "@/app/components/landing/Footer"
+import Footer from "@/app/components/landing/Footer"
 import Header from "@/app/components/landing/Header"
 import Hero from "@/app/components/landing/Hero"
 import Section from "@/app/components/landing/Section"
@@ -25,7 +25,7 @@ export default function Home() {
         <Section className="z-10 -mt-44" id="demo">
           <Demo />
         </Section>
-        <Foo />
+        <Footer />
       </Content>
     </>
   )
