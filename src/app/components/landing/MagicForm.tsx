@@ -1,7 +1,7 @@
 "use client"
 
 import Form, { withTheme } from "@rjsf/core"
-import { RJSFSchema, UiSchema } from "@rjsf/utils"
+import { RJSFSchema } from "@rjsf/utils"
 import validator from "@rjsf/validator-ajv8"
 import React, { useEffect, useRef, useState } from "react"
 import { EventEmitter } from "events"
