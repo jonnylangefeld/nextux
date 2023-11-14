@@ -170,12 +170,14 @@ export const creditCardFormSchema: RJSFSchema = {
   required: ["cardNumber", "cardholderName", "expirationDate", "cvv"],
   properties: {
     cardNumber: {
+      title: "Card Number",
       type: "string",
       description: "The credit card number",
       pattern: "^[0-9]{13,19}$",
       examples: "4111111111111111",
     },
     cardholderName: {
+      title: "Cardholder Name",
       type: "string",
       description: "The first and last name as embossed on the card",
       examples: "John Doe",
@@ -186,12 +188,14 @@ export const creditCardFormSchema: RJSFSchema = {
       description: "The expiration date of the credit card",
       properties: {
         month: {
+          title: "Month",
           type: "integer",
           description: "the month of the credit card expiration date",
           minimum: 1,
           maximum: 12,
         },
         year: {
+          title: "Year",
           type: "integer",
           description: "the year of the credit card expiration date",
           examples: [2030, 2034],
@@ -200,6 +204,7 @@ export const creditCardFormSchema: RJSFSchema = {
       required: ["month", "year"],
     },
     cvv: {
+      title: "CVV",
       type: "string",
       description: "The card verification value (usually 3 or 4 digits)",
       pattern: "^[0-9]{3,4}$",
