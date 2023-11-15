@@ -2,7 +2,7 @@
 
 [![Main](https://github.com/jonnylangefeld/nextux/actions/workflows/main.yml/badge.svg)](https://github.com/jonnylangefeld/nextux/actions/workflows/main.yml)
 
-This app showcases how to use the [OpenAI](https://openai.com) API to extract structured data from a recording spoken into a microphone. We make use of the [Whisper API](https://whisper.openai.com), as well as [function calling](https://platform.openai.com/docs/guides/function-calling) to extract the data. The UI showcases a demo with a form that can be filled out with your voice.
+This app showcases how to use the [OpenAI](https://openai.com) API to extract structured data from a recording spoken into a microphone. We make use of the [Whisper API](https://whisper.openai.com), as well as [function calling](https://platform.openai.com/docs/guides/function-calling) to extract the data. Most of the AI magic is located in the [`src/app/api/extract/functions.ts`](src/app/api/extract/functions.ts) file. The UI showcases a demo with a form that can be filled out with your voice.
 
 Try it out at [nextux.ai](https://nextux.ai).
 
@@ -58,7 +58,7 @@ All calls to third party APIs are being mocked from a prerecording using Polly.j
 
 The recording button is animated using [Rive](https://rive.app).
 
-## API Types Defined with [protobuf](https://protobuf.dev/).
+## API Types Defined with [protobuf](https://protobuf.dev/)
 
 The API types are defined using [protobuf](https://protobuf.dev/) and the source of truth is stored in the [`proto`](proto) directory. The fields are annotated with [`ts-to-zod`](https://www.npmjs.com/package/ts-to-zod) annotations. Run `npm run types` to generate the typescript files and the `zod` schema.
 
