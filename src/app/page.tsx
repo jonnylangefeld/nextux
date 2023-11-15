@@ -22,7 +22,7 @@ export default function Home() {
       <Header />
       <Content>
         <Hero />
-        <Section className="z-10 -mt-44" id="demo">
+        <Section className="z-10 -mt-48" id="demo">
           <Demo />
         </Section>
         <Footer />
